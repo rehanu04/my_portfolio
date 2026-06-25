@@ -61,7 +61,7 @@ export default function TimelineEntry({ entry, index }: TimelineEntryProps) {
       <div className="absolute left-[14px] top-5 z-10">
         {/* Outer pulse ring */}
         <motion.div
-          className="absolute inset-0 rounded-full border border-cyan-galactic"
+          className="absolute inset-0 rounded-full border border-god-crimson"
           initial={{ scale: 1, opacity: 0 }}
           whileInView={{ scale: [1, 2.2], opacity: [0.7, 0] }}
           viewport={{ once: true, margin: '-80px' }}
@@ -73,13 +73,13 @@ export default function TimelineEntry({ entry, index }: TimelineEntryProps) {
           style={{ width: 16, height: 16 }}
         />
         {/* Node */}
-        <div className="w-4 h-4 rounded-full border-2 border-cyan-galactic bg-surface flex items-center justify-center glow-cyan-sm">
-          <div className="w-1.5 h-1.5 rounded-full bg-cyan-galactic" />
+        <div className="w-4 h-4 rounded-full border-2 border-god-crimson bg-surface flex items-center justify-center glow-crimson-sm">
+          <div className="w-1.5 h-1.5 rounded-full bg-god-crimson" />
         </div>
       </div>
 
       {/* Connector line */}
-      <div className="absolute left-[21px] top-9 bottom-0 w-px bg-gradient-to-b from-cyan-galactic/30 via-surface-3/50 to-transparent" />
+      <div className="absolute left-[21px] top-9 bottom-0 w-px bg-gradient-to-b from-god-crimson/30 via-surface-3/50 to-transparent" />
 
       {/* Glass card */}
       <animated.div
@@ -92,7 +92,7 @@ export default function TimelineEntry({ entry, index }: TimelineEntryProps) {
         <div className="p-6 space-y-3">
           {/* Meta row */}
           <div className="flex flex-wrap items-center gap-3">
-            <span className="font-mono text-xs text-cyan-galactic tracking-wider text-glow-cyan">
+            <span className="font-mono text-xs text-god-crimson tracking-wider text-glow-crimson">
               {entry.period}
             </span>
             <span className="text-surface-3 text-xs">//</span>
@@ -102,7 +102,7 @@ export default function TimelineEntry({ entry, index }: TimelineEntryProps) {
           {/* Role heading */}
           <h3
             className={`font-display font-semibold text-xl md:text-2xl leading-tight transition-colors duration-300 ${
-              isHovered ? 'text-cyan-galactic' : 'text-text-primary'
+              isHovered ? 'text-god-crimson' : 'text-text-primary'
             }`}
             style={{ transform: isHovered ? 'translateZ(8px)' : 'translateZ(0px)', transition: 'transform 0.2s ease, color 0.3s ease' }}
           >
@@ -119,7 +119,7 @@ export default function TimelineEntry({ entry, index }: TimelineEntryProps) {
             {entry.tags.map((tag) => (
               <span
                 key={tag}
-                className="font-mono text-[10px] px-2.5 py-1 border border-surface-3 text-text-muted hover:border-cyan-galactic/50 hover:text-text-primary transition-colors duration-200"
+                className="font-mono text-[10px] px-2.5 py-1 border border-surface-3 text-text-muted hover:border-god-crimson/50 hover:text-text-primary transition-colors duration-200"
               >
                 {tag}
               </span>

@@ -24,13 +24,13 @@ import { useCursorContext } from '../../context/CursorContext'
 // ─── Colour lookups ───────────────────────────────────────────────────────────
 
 const STATUS_COLOUR: Record<Project['status'], string> = {
-  ACTIVE:      'text-cyan-galactic',
+  ACTIVE:      'text-god-crimson',
   DEPLOYED:    'text-green-400',
   OPERATIONAL: 'text-blue-400',
 }
 
 const STATUS_DOT: Record<Project['status'], string> = {
-  ACTIVE:      'bg-cyan-galactic shadow-[0_0_8px_rgba(0,245,255,0.8)]',
+  ACTIVE:      'bg-god-crimson shadow-[0_0_8px_rgba(255,30,30,0.8)]',
   DEPLOYED:    'bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.8)]',
   OPERATIONAL: 'bg-blue-400 shadow-[0_0_8px_rgba(96,165,250,0.8)]',
 }
@@ -38,7 +38,7 @@ const STATUS_DOT: Record<Project['status'], string> = {
 const CHIP_BG: Record<string, string> = {
   frontend: 'border-blue-500/40 text-blue-400 bg-blue-500/10',
   backend:  'border-green-500/40 text-green-400 bg-green-500/10',
-  ai:       'border-cyan-500/40 text-cyan-galactic bg-cyan-500/10',
+  ai:       'border-cyan-500/40 text-god-crimson bg-cyan-500/10',
   infra:    'border-orange-500/40 text-orange-400 bg-orange-500/10',
   mobile:   'border-purple-500/40 text-purple-400 bg-purple-500/10',
 }
@@ -178,7 +178,7 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
               {project.category}
             </p>
             <h3 className={`font-display font-bold text-2xl md:text-3xl leading-tight transition-colors duration-300 ${
-              isHovered ? 'text-cyan-galactic text-glow-cyan' : 'text-text-primary'
+              isHovered ? 'text-god-crimson text-glow-crimson' : 'text-text-primary'
             }`}>
               {project.title}
             </h3>
@@ -218,7 +218,7 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
             {project.metrics.map((m) => (
               <div key={m.label} className="flex flex-col gap-1">
                 <p className="font-mono text-[9px] text-text-muted tracking-wider uppercase">{m.label}</p>
-                <p className="font-mono text-[11px] text-cyan-galactic leading-tight font-semibold text-glow-cyan">
+                <p className="font-mono text-[11px] text-god-crimson leading-tight font-semibold text-glow-crimson">
                   {m.value}{m.unit ? ` ${m.unit}` : ''}
                 </p>
               </div>
@@ -228,13 +228,13 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
           {/* Toggle hint */}
           <div className="flex items-center gap-2 pt-1">
             <span className={`font-mono text-[10px] tracking-wider transition-colors duration-200 ${
-              isHovered ? 'text-cyan-galactic' : 'text-text-muted'
+              isHovered ? 'text-god-crimson' : 'text-text-muted'
             }`}>
               {telemetryOpen ? '[ CLOSE TELEMETRY ]' : '[ OPEN TELEMETRY ]'}
             </span>
             <motion.svg
               width="10" height="10" viewBox="0 0 10 10" fill="none"
-              className={`transition-colors duration-200 ${isHovered ? 'text-cyan-galactic' : 'text-text-muted'}`}
+              className={`transition-colors duration-200 ${isHovered ? 'text-god-crimson' : 'text-text-muted'}`}
               animate={{ rotate: telemetryOpen ? 90 : 0 }}
               transition={{ type: 'spring', stiffness: 300, damping: 20 }}
             >

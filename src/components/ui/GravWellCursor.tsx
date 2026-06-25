@@ -165,8 +165,8 @@ export default function GravWellCursor() {
               width: 8,
               height: 8,
               borderRadius: '50%',
-              background: '#00F5FF',
-              boxShadow: '0 0 10px rgba(0,245,255,0.8), 0 0 24px rgba(0,245,255,0.3)',
+              background: '#FF1E1E',
+              boxShadow: '0 0 10px rgba(255,30,30,0.8), 0 0 24px rgba(255,30,30,0.3)',
               position: 'absolute',
               top: '50%',
               left: '50%',
@@ -180,7 +180,7 @@ export default function GravWellCursor() {
               width: 32,
               height: 32,
               borderRadius: '50%',
-              border: '1px solid rgba(0,245,255,0.45)',
+              border: '1px solid rgba(255,30,30,0.45)',
               position: 'absolute',
               top: '50%',
               left: '50%',
@@ -217,7 +217,7 @@ export default function GravWellCursor() {
               <circle
                 cx={32} cy={32} r={28}
                 fill="none"
-                stroke="rgba(0,245,255,0.7)"
+                stroke="rgba(255,30,30,0.7)"
                 strokeWidth={1}
                 strokeDasharray="20 8"
               />
@@ -236,7 +236,7 @@ export default function GravWellCursor() {
               <circle
                 cx={32} cy={32} r={20}
                 fill="none"
-                stroke="rgba(0,245,255,0.35)"
+                stroke="rgba(255,30,30,0.35)"
                 strokeWidth={0.75}
                 strokeDasharray="6 10"
               />
@@ -264,10 +264,10 @@ export default function GravWellCursor() {
                     width: 8,
                     height: 8,
                     ...rest,
-                    borderTop: '1.5px solid rgba(0,245,255,0.9)',
-                    borderLeft: '1.5px solid rgba(0,245,255,0.9)',
+                    borderTop: '1.5px solid rgba(255,30,30,0.9)',
+                    borderLeft: '1.5px solid rgba(255,30,30,0.9)',
                     transform: `rotate(${rotateDeg}deg)`,
-                    boxShadow: '0 0 4px rgba(0,245,255,0.5)',
+                    boxShadow: '0 0 4px rgba(255,30,30,0.5)',
                   }}
                 />
               )
@@ -281,7 +281,7 @@ export default function GravWellCursor() {
               transform: 'translate(-50%, -50%)',
               width: 18,
               height: 1,
-              background: 'rgba(0,245,255,0.8)',
+              background: 'rgba(255,30,30,0.8)',
             }} />
             <div style={{
               position: 'absolute',
@@ -290,7 +290,7 @@ export default function GravWellCursor() {
               transform: 'translate(-50%, -50%)',
               width: 1,
               height: 18,
-              background: 'rgba(0,245,255,0.8)',
+              background: 'rgba(255,30,30,0.8)',
             }} />
           </animated.div>
         </animated.div>

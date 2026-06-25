@@ -12,8 +12,9 @@ const config: Config = {
         'surface-2':      '#1A1C1E',
         'surface-3':      '#242628',
         'surface-4':      '#2E3032',
-        'cyan-galactic':  '#00F5FF',
-        'cyan-dim':       '#00C4CC',
+        'god-crimson':    '#FF1E1E', // Deep God Crimson
+        'god-violet':     '#5D00E6', // Royal Space Violet
+        'god-gold':       '#FFD700', // Cosmic Gold
         'text-primary':   '#E8EAF0',
         'text-secondary': '#B8BCC8',
         'text-muted':     '#6B7280',

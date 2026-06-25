@@ -45,15 +45,15 @@
   ::-webkit-scrollbar { width: 2px; }
   ::-webkit-scrollbar-track { background: #0a0c0e; }
   ::-webkit-scrollbar-thumb {
-    background: rgba(0, 245, 255, 0.45);
+    background: rgba(255, 30, 30, 0.45);
     border-radius: 2px;
   }
-  ::-webkit-scrollbar-thumb:hover { background: #00f5ff; }
+  ::-webkit-scrollbar-thumb:hover { background: #FF1E1E; }
 
   /* Selection highlight */
   ::selection {
-    background: rgba(0, 245, 255, 0.18);
-    color: #00f5ff;
+    background: rgba(255, 30, 30, 0.18);
+    color: #FF1E1E;
   }
 }
 
@@ -89,7 +89,7 @@
     background: rgba(0, 0, 0, 0.45);
     backdrop-filter: blur(32px) saturate(120%);
     -webkit-backdrop-filter: blur(32px) saturate(120%);
-    border: 1px solid rgba(0, 245, 255, 0.08);
+    border: 1px solid rgba(255, 30, 30, 0.08);
   }
 
   /* Glass Monolith — the premium card surface with specular refraction */
@@ -100,7 +100,7 @@
         135deg,
         rgba(255, 255, 255, 0.055) 0%,
         rgba(255, 255, 255, 0.015) 50%,
-        rgba(0, 245, 255, 0.02) 100%
+        rgba(255, 30, 30, 0.02) 100%
       );
     backdrop-filter: blur(24px) saturate(180%);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
@@ -108,18 +108,18 @@
     box-shadow:
       0 4px 32px rgba(0, 0, 0, 0.55),
       0 1px 0 rgba(255, 255, 255, 0.08) inset,
-      0 0 0 1px rgba(0, 245, 255, 0.04) inset;
+      0 0 0 1px rgba(255, 30, 30, 0.04) inset;
     transform-style: preserve-3d;
     transition: border-color 0.4s ease, box-shadow 0.4s ease;
   }
 
   .glass-monolith:hover {
-    border-color: rgba(0, 245, 255, 0.28);
+    border-color: rgba(255, 30, 30, 0.28);
     box-shadow:
       0 8px 48px rgba(0, 0, 0, 0.65),
-      0 0 32px rgba(0, 245, 255, 0.08),
+      0 0 32px rgba(255, 30, 30, 0.08),
       0 1px 0 rgba(255, 255, 255, 0.12) inset,
-      0 0 0 1px rgba(0, 245, 255, 0.12) inset;
+      0 0 0 1px rgba(255, 30, 30, 0.12) inset;
   }
 
   /* Specular sheen overlay — cursor-tracking radial gradient */
@@ -130,7 +130,7 @@
     border-radius: inherit;
     background: radial-gradient(
       circle at var(--card-shine-x) var(--card-shine-y),
-      rgba(0, 245, 255, 0.10) 0%,
+      rgba(255, 30, 30, 0.10) 0%,
       rgba(255, 255, 255, 0.04) 30%,
       transparent 70%
     );
@@ -159,27 +159,27 @@
 
   /* ── Glow utilities ───────────────────────────────────────────────────── */
 
-  .glow-cyan {
+  .glow-crimson {
     box-shadow:
-      0 0 18px rgba(0, 245, 255, 0.30),
-      0 0 60px rgba(0, 245, 255, 0.10);
+      0 0 18px rgba(255, 30, 30, 0.30),
+      0 0 60px rgba(255, 30, 30, 0.10);
   }
 
-  .glow-cyan-sm {
-    box-shadow: 0 0 8px rgba(0, 245, 255, 0.22);
+  .glow-crimson-sm {
+    box-shadow: 0 0 8px rgba(255, 30, 30, 0.22);
   }
 
-  .glow-cyan-intense {
+  .glow-crimson-intense {
     box-shadow:
-      0 0 30px rgba(0, 245, 255, 0.50),
-      0 0 80px rgba(0, 245, 255, 0.20),
-      0 0 120px rgba(0, 245, 255, 0.08);
+      0 0 30px rgba(255, 30, 30, 0.50),
+      0 0 80px rgba(255, 30, 30, 0.20),
+      0 0 120px rgba(255, 30, 30, 0.08);
   }
 
-  .text-glow-cyan {
+  .text-glow-crimson {
     text-shadow:
-      0 0 24px rgba(0, 245, 255, 0.55),
-      0 0 60px rgba(0, 245, 255, 0.22);
+      0 0 24px rgba(255, 30, 30, 0.55),
+      0 0 60px rgba(255, 30, 30, 0.22);
   }
 
   .text-glow-white {
@@ -194,8 +194,8 @@
       0deg,
       transparent,
       transparent 2px,
-      rgba(0, 245, 255, 0.020) 2px,
-      rgba(0, 245, 255, 0.020) 4px
+      rgba(255, 30, 30, 0.020) 2px,
+      rgba(255, 30, 30, 0.020) 4px
     );
   }
 
@@ -204,8 +204,8 @@
       -45deg,
       transparent,
       transparent 6px,
-      rgba(0, 245, 255, 0.012) 6px,
-      rgba(0, 245, 255, 0.012) 7px
+      rgba(255, 30, 30, 0.012) 6px,
+      rgba(255, 30, 30, 0.012) 7px
     );
   }
 

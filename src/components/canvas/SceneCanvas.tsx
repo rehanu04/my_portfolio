@@ -24,8 +24,7 @@ import { BlendFunction } from 'postprocessing'
 import { Vector2 } from 'three'
 import * as THREE from 'three'
 import CameraRig from './CameraRig'
-import LorenzField from './ParticleCloud'
-import NeuralMesh from './NeuralMesh'
+import EnergyField from './EnergyField'
 import CoordinateGrid from './CoordinateGrid'
 import { useScrollContext } from '../../context/ScrollContext'
 
@@ -53,9 +52,9 @@ function DynamicPostProcessing() {
     <EffectComposer>
       {/* ── Selective Bloom ────────────────────────────────────────────── */}
       <Bloom
-        luminanceThreshold={0.60}
-        luminanceSmoothing={0.06}
-        intensity={1.25}
+        luminanceThreshold={0.45} // Lowered for deeper reds and purples
+        luminanceSmoothing={0.15}
+        intensity={1.8} // Boosted intensity for god ki glow
         blendFunction={BlendFunction.ADD}
       />
 
@@ -89,18 +88,19 @@ function DynamicPostProcessing() {
 
 // ─── Main Canvas ─────────────────────────────────────────────────────────────
 
-export default function SceneCanvas() {
+// Children prop added because we will inject HTML sections from App.tsx
+export default function SceneCanvas({ children }: { children?: React.ReactNode }) {
   return (
     <div
       style={{
         position:      'fixed',
         inset:         0,
         zIndex:        0,
-        pointerEvents: 'none',
+        pointerEvents: 'none', // pointer events handled by Html component inside
       }}
     >
       <Canvas
-        camera={{ position: [0, 3, 28], fov: 58, near: 0.1, far: 800 }}
+        camera={{ position: [0, 3, 28], fov: 58, near: 0.1, far: 1000 }} // Extended far plane
         gl={{
           antialias:           true,
           alpha:               true,
@@ -117,14 +117,14 @@ export default function SceneCanvas() {
           {/* Minimal ambient — scene reads cleanly against dark page */}
           <ambientLight intensity={0.04} />
 
-          {/* Dual-layer Lorenz attractor — speed-coloured, focal-warp */}
-          <LorenzField />
+          {/* God-Tier Saiyan Energy Field */}
+          <EnergyField />
 
-          {/* Wave-displaced morphing sphere — deep-field spatial persistence */}
-          <NeuralMesh />
-
-          {/* Galactic Cyan coordinate grid — always-on, swells in contact */}
+          {/* Violet/Gold coordinate grid — always-on, swells in contact */}
           <CoordinateGrid />
+
+          {/* Render 3D HTML nodes inside the WebGL context */}
+          {children}
 
           {/* ── Cinematic Post-Processing ────────────────────────────── */}
           <DynamicPostProcessing />

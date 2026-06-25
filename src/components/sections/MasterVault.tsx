@@ -28,7 +28,7 @@ export default function MasterVault() {
     <section
       id="master-vault"
       ref={sectionRef}
-      className="relative min-h-screen flex items-center px-8 md:px-16 lg:px-24 py-24 overflow-hidden"
+      className="relative w-full h-auto flex items-center px-8 md:px-16 lg:px-24 py-24 overflow-hidden"
     >
       {/* Subtle diagonal scan lines */}
       <div className="pointer-events-none absolute inset-0 scanlines opacity-15" />
@@ -43,11 +43,11 @@ export default function MasterVault() {
           transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
         >
           <div className="flex flex-col items-center gap-2 pt-2 shrink-0">
-            <div className="h-px w-10 bg-cyan-galactic" />
-            <div className="w-px h-14 bg-gradient-to-b from-cyan-galactic to-transparent" />
+            <div className="h-px w-10 bg-god-crimson" />
+            <div className="w-px h-14 bg-gradient-to-b from-god-crimson to-transparent" />
           </div>
           <div>
-            <p className="font-mono text-xs tracking-[0.32em] text-cyan-galactic uppercase mb-3 text-glow-cyan">
+            <p className="font-mono text-xs tracking-[0.32em] text-god-crimson uppercase mb-3 text-glow-crimson">
               sys::vault — SECTION_03
             </p>
             <h2 className="font-display font-bold text-4xl md:text-6xl text-text-primary leading-tight">

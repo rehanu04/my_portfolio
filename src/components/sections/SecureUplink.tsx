@@ -114,7 +114,7 @@ function ContactCard({ channel, index }: ContactCardProps) {
           {/* Icon box */}
           <div className={`w-12 h-12 border flex items-center justify-center transition-all duration-300 ${
             isHovered
-              ? 'border-cyan-galactic text-cyan-galactic glow-cyan'
+              ? 'border-god-crimson text-god-crimson glow-crimson'
               : 'border-surface-3 text-text-muted'
           }`}>
             {CHANNEL_ICONS[channel.id]}
@@ -122,7 +122,7 @@ function ContactCard({ channel, index }: ContactCardProps) {
 
           <div className="text-center">
             <p className={`font-mono text-sm font-medium tracking-widest transition-colors duration-200 ${
-              isHovered ? 'text-cyan-galactic text-glow-cyan' : 'text-text-primary'
+              isHovered ? 'text-god-crimson text-glow-crimson' : 'text-text-primary'
             }`}>
               {channel.label}
             </p>
@@ -130,7 +130,7 @@ function ContactCard({ channel, index }: ContactCardProps) {
           </div>
 
           <div className={`flex items-center gap-1.5 transition-colors duration-200 ${
-            isHovered ? 'text-cyan-galactic' : 'text-text-muted'
+            isHovered ? 'text-god-crimson' : 'text-text-muted'
           }`}>
             <span className="font-mono text-[10px] tracking-widest">CONNECT</span>
             <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
@@ -157,7 +157,7 @@ export default function SecureUplink() {
     <section
       id="secure-uplink"
       ref={sectionRef}
-      className="relative min-h-screen flex flex-col items-center justify-center px-8 md:px-16 lg:px-24 py-24"
+      className="relative w-full h-auto flex flex-col items-center justify-center px-8 md:px-16 lg:px-24 py-24"
     >
       <div className="w-full max-w-4xl mx-auto text-center">
         {/* Header */}
@@ -168,13 +168,13 @@ export default function SecureUplink() {
           viewport={{ once: true, margin: '-100px' }}
           transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
         >
-          <p className="font-mono text-xs tracking-[0.32em] text-cyan-galactic uppercase mb-5 text-glow-cyan">
+          <p className="font-mono text-xs tracking-[0.32em] text-god-crimson uppercase mb-5 text-glow-crimson">
             {UPLINK_META.sectionTag}
           </p>
           <h2 className="font-display font-bold text-4xl md:text-6xl text-text-primary leading-tight mb-4">
             {UPLINK_META.headline1}
             <br />
-            <span className="text-cyan-galactic text-glow-cyan">{UPLINK_META.headline2}</span>
+            <span className="text-god-crimson text-glow-crimson">{UPLINK_META.headline2}</span>
           </h2>
           <p className="text-text-muted font-display text-lg max-w-md mx-auto leading-relaxed">
             {UPLINK_META.subtext}
@@ -212,20 +212,20 @@ export default function SecureUplink() {
           <div className="flex items-center justify-center gap-3">
             <div className="relative w-5 h-5">
               {/* Core dot */}
-              <div className="absolute inset-[4px] rounded-full bg-cyan-galactic" />
+              <div className="absolute inset-[4px] rounded-full bg-god-crimson" />
               {/* Pulse ring 1 */}
-              <div className="absolute inset-0 rounded-full border border-cyan-galactic/50 animate-pulse-ring" />
+              <div className="absolute inset-0 rounded-full border border-god-crimson/50 animate-pulse-ring" />
               {/* Pulse ring 2 */}
-              <div className="absolute inset-0 rounded-full border border-cyan-galactic/30 animate-pulse-ring"
+              <div className="absolute inset-0 rounded-full border border-god-crimson/30 animate-pulse-ring"
                 style={{ animationDelay: '0.5s' }}
               />
               {/* Orbiting dot */}
               <div
-                className="absolute top-1/2 left-1/2 w-1 h-1 rounded-full bg-cyan-galactic animate-orbit"
+                className="absolute top-1/2 left-1/2 w-1 h-1 rounded-full bg-god-crimson animate-orbit"
                 style={{ transformOrigin: '0 0' }}
               />
             </div>
-            <span className="font-mono text-xs text-cyan-galactic text-glow-cyan">ONLINE</span>
+            <span className="font-mono text-xs text-god-crimson text-glow-crimson">ONLINE</span>
           </div>
         </motion.div>
       </div>

@@ -56,7 +56,10 @@ const fragmentShader = /* glsl */ `
       1.0 - abs(pulseDist - mod(uTime * 8.0, 60.0)) * 0.4
     ) * 0.6;
 
-    vec3  colour = vec3(0.0, 0.96, 1.0); // Galactic Cyan
+    vec3 colViolet = vec3(0.36, 0.0, 0.90); // Royal Space Violet
+    vec3 colGold   = vec3(1.0, 0.84, 0.0);  // Cosmic Gold
+    vec3 colour = mix(colViolet, colGold, pulse * 1.5);
+    
     float alpha  = grid * fade * uOpacity * (0.35 + ambient * 0.10 + pulse);
 
     gl_FragColor = vec4(colour, alpha);

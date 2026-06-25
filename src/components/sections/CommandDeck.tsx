@@ -40,7 +40,7 @@ function CornerReticle({ pos }: { pos: string }) {
     <motion.svg
       width={28} height={28}
       viewBox="0 0 28 28"
-      className={`absolute ${pos} text-cyan-galactic`}
+      className={`absolute ${pos} text-god-crimson`}
       fill="none"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -94,11 +94,11 @@ export default function CommandDeck() {
     <section
       id="command-deck"
       ref={sectionRef}
-      className="relative min-h-screen flex items-center px-8 md:px-16 lg:px-24 py-28 overflow-hidden"
+      className="relative w-full h-auto flex items-center px-8 md:px-16 lg:px-24 py-28 overflow-hidden"
     >
       {/* Animated scan line */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="animate-scan absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-galactic to-transparent opacity-10" />
+        <div className="animate-scan absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-god-crimson to-transparent opacity-10" />
       </div>
 
       {/* Diagonal scan lines background */}
@@ -116,11 +116,11 @@ export default function CommandDeck() {
         <div className="space-y-8">
           {/* System status label */}
           <motion.div variants={FADE_UP} className="flex items-center gap-3">
-            <div className="h-px w-10 bg-gradient-to-r from-cyan-galactic to-transparent" />
-            <span className="font-mono text-xs tracking-[0.32em] text-cyan-galactic uppercase text-glow-cyan">
+            <div className="h-px w-10 bg-gradient-to-r from-god-crimson to-transparent" />
+            <span className="font-mono text-xs tracking-[0.32em] text-god-crimson uppercase text-glow-crimson">
               {IDENTITY.systemTag}
             </span>
-            <div className="w-1.5 h-1.5 rounded-full bg-cyan-galactic animate-pulse" />
+            <div className="w-1.5 h-1.5 rounded-full bg-god-crimson animate-pulse" />
           </motion.div>
 
           {/* Primary heading — depth layers */}
@@ -138,7 +138,7 @@ export default function CommandDeck() {
                 {IDENTITY.displayName.split(' ')[0]}
               </span>
               <span
-                className="block text-5xl md:text-7xl lg:text-[5.5rem] text-cyan-galactic text-glow-cyan"
+                className="block text-5xl md:text-7xl lg:text-[5.5rem] text-god-crimson text-glow-crimson"
                 style={{ transform: 'translateZ(14px)', display: 'block' }}
               >
                 {IDENTITY.displayName.split(' ')[1]}
@@ -148,7 +148,7 @@ export default function CommandDeck() {
 
           {/* Horizontal rule */}
           <motion.div variants={FADE_UP} className="flex items-center gap-4">
-            <div className="h-px flex-1 bg-gradient-to-r from-cyan-galactic/60 to-transparent" />
+            <div className="h-px flex-1 bg-gradient-to-r from-god-crimson/60 to-transparent" />
             <span className="font-mono text-xs text-text-muted tracking-widest">{IDENTITY.shortTitle}</span>
           </motion.div>
 
@@ -186,10 +186,10 @@ export default function CommandDeck() {
               id="hero-cta-vault"
               href="#master-vault"
               data-cursor="target"
-              className="group relative inline-flex items-center gap-3 px-7 py-3.5 border border-cyan-galactic text-cyan-galactic font-mono text-sm tracking-widest overflow-hidden transition-colors duration-300 hover:text-surface glow-cyan"
+              className="group relative inline-flex items-center gap-3 px-7 py-3.5 border border-god-crimson text-god-crimson font-mono text-sm tracking-widest overflow-hidden transition-colors duration-300 hover:text-surface glow-crimson"
             >
               {/* Hover fill */}
-              <span className="absolute inset-0 bg-cyan-galactic transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-in-out" />
+              <span className="absolute inset-0 bg-god-crimson transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-in-out" />
               <span className="relative z-10">VIEW SYSTEMS</span>
               <svg
                 width="14" height="14" viewBox="0 0 14 14" fill="none"
@@ -202,7 +202,7 @@ export default function CommandDeck() {
               id="hero-cta-uplink"
               href="#secure-uplink"
               data-cursor="target"
-              className="font-mono text-sm text-text-muted tracking-widest hover:text-cyan-galactic transition-colors duration-200"
+              className="font-mono text-sm text-text-muted tracking-widest hover:text-god-crimson transition-colors duration-200"
             >
               ESTABLISH UPLINK
             </a>
@@ -229,7 +229,7 @@ export default function CommandDeck() {
         >
           <div className="relative w-72 h-[400px] md:w-[340px] md:h-[460px]">
             {/* Ambient glow */}
-            <div className="absolute inset-0 bg-cyan-galactic opacity-[0.07] blur-3xl scale-110 rounded-full" />
+            <div className="absolute inset-0 bg-god-crimson opacity-[0.07] blur-3xl scale-110 rounded-full" />
 
             {/* Corner reticles */}
             <CornerReticle pos="top-0 left-0" />
@@ -250,24 +250,24 @@ export default function CommandDeck() {
                   <div
                     className="w-24 h-24 rounded-full flex items-center justify-center"
                     style={{
-                      background: 'conic-gradient(from 0deg, #00F5FF, #0066FF, #00F5FF)',
+                      background: 'conic-gradient(from 0deg, #FF1E1E, #0066FF, #FF1E1E)',
                       padding: '2px',
                       animation: 'reticle-spin 6s linear infinite',
                     }}
                   >
-                    <div className="w-full h-full rounded-full bg-surface-2 flex items-center justify-center glow-cyan">
-                      <span className="font-display font-bold text-3xl text-cyan-galactic text-glow-cyan">MR</span>
+                    <div className="w-full h-full rounded-full bg-surface-2 flex items-center justify-center glow-crimson">
+                      <span className="font-display font-bold text-3xl text-god-crimson text-glow-crimson">MR</span>
                     </div>
                   </div>
                   {/* Pulse ring */}
                   <div
-                    className="absolute inset-0 rounded-full border border-cyan-galactic/40 animate-pulse-ring"
+                    className="absolute inset-0 rounded-full border border-god-crimson/40 animate-pulse-ring"
                     style={{ animationDelay: '0.5s' }}
                   />
                 </div>
 
                 <div className="text-center space-y-1.5">
-                  <p className="font-mono text-[10px] tracking-[0.28em] text-cyan-galactic text-glow-cyan">
+                  <p className="font-mono text-[10px] tracking-[0.28em] text-god-crimson text-glow-crimson">
                     IDENTITY — VERIFIED
                   </p>
                   <p className="font-mono text-[9px] text-text-muted leading-tight max-w-[185px] text-center">
@@ -280,12 +280,12 @@ export default function CommandDeck() {
                   {IDENTITY.profileTags.map((tag, i) => (
                     <motion.div
                       key={tag}
-                      className="flex items-center gap-2 px-3 py-1.5 border border-surface-3 hover:border-cyan-galactic/40 transition-colors duration-200"
+                      className="flex items-center gap-2 px-3 py-1.5 border border-surface-3 hover:border-god-crimson/40 transition-colors duration-200"
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 1.0 + i * 0.08, duration: 0.5 }}
                     >
-                      <div className="w-1 h-1 rounded-full bg-cyan-galactic" />
+                      <div className="w-1 h-1 rounded-full bg-god-crimson" />
                       <span className="font-mono text-[10px] text-text-muted tracking-wider">{tag}</span>
                     </motion.div>
                   ))}
@@ -304,9 +304,9 @@ export default function CommandDeck() {
         transition={{ delay: 2.0, duration: 0.8 }}
       >
         <span className="font-mono text-[10px] text-text-muted tracking-[0.28em]">SCROLL TO TRAVERSE</span>
-        <div className="w-px h-12 bg-gradient-to-b from-cyan-galactic to-transparent" />
+        <div className="w-px h-12 bg-gradient-to-b from-god-crimson to-transparent" />
         <motion.div
-          className="w-1.5 h-1.5 rounded-full bg-cyan-galactic"
+          className="w-1.5 h-1.5 rounded-full bg-god-crimson"
           animate={{ y: [0, 6, 0], opacity: [1, 0.3, 1] }}
           transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
         />

@@ -36,20 +36,20 @@ interface Waypoint {
 }
 
 const WP: Waypoint[] = [
-  // 0.00 — Command Deck: front, slightly elevated
-  { pos: new THREE.Vector3(  0,   3.0, 28), target: new THREE.Vector3(  0,  0.5,  0) },
-  // 0.16 — Mid-hero sweep: aggressive left X-pan, gentle pull-back
-  { pos: new THREE.Vector3(-14,  -0.5, 24), target: new THREE.Vector3( -3, -0.5,  0) },
-  // 0.33 — Arch Log arc: barrel right, deep Z plunge
-  { pos: new THREE.Vector3(  8,  -5.0, 16), target: new THREE.Vector3(  2, -2.0,  0) },
-  // 0.50 — Arch Log peak: arcing overhead, maximum height
-  { pos: new THREE.Vector3( -6,   8.0, 12), target: new THREE.Vector3( -1,  2.0,  0) },
-  // 0.66 — Master Vault: high-right orbit, deepest Z
-  { pos: new THREE.Vector3( 13,   6.0,  8), target: new THREE.Vector3(  3,  1.5,  0) },
-  // 0.83 — Vault apex: counter-left sweep with downward Y tilt
-  { pos: new THREE.Vector3(-10,  -2.0, 14), target: new THREE.Vector3( -2, -1.0,  0) },
-  // 1.00 — Secure Uplink: pull back near-centre, looking inward
-  { pos: new THREE.Vector3( -1,  -2.5, 26), target: new THREE.Vector3(  0, -0.5,  0) },
+  // 0.00 — Command Deck: front, slightly elevated, looking at [0,0,0]
+  { pos: new THREE.Vector3(  0,   0,   18), target: new THREE.Vector3(  0,   0,   0) },
+  // 0.16 — Mid-arc to Arch Log: sweeping right and down
+  { pos: new THREE.Vector3(  8,  -5,    5), target: new THREE.Vector3(  5,  -5, -10) },
+  // 0.33 — System Arch Log: focused on [15, -10, -25]
+  { pos: new THREE.Vector3( 15, -10,  -10), target: new THREE.Vector3( 15, -10, -25) },
+  // 0.50 — Mid-arc to Vault: sweeping left and deeper
+  { pos: new THREE.Vector3( -5, -20,  -25), target: new THREE.Vector3( -10, -20, -40) },
+  // 0.66 — Master Vault: focused on [-20, -30, -60]
+  { pos: new THREE.Vector3(-20, -30,  -45), target: new THREE.Vector3(-20, -30, -60) },
+  // 0.83 — Mid-arc to Uplink: sweeping right and further down
+  { pos: new THREE.Vector3( -5, -35,  -55), target: new THREE.Vector3(  0, -40, -75) },
+  // 1.00 — Secure Uplink: focused on [10, -45, -90]
+  { pos: new THREE.Vector3( 10, -45,  -75), target: new THREE.Vector3( 10, -45, -90) },
 ]
 
 // ─── Catmull-Rom Hermite interpolation ───────────────────────────────────────

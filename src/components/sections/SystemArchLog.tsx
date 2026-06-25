@@ -26,7 +26,7 @@ export default function SystemArchLog() {
     <section
       id="system-arch-log"
       ref={sectionRef}
-      className="relative min-h-screen flex items-center px-8 md:px-16 lg:px-24 py-24 overflow-hidden"
+      className="relative w-full h-auto flex items-center px-8 md:px-16 lg:px-24 py-24 overflow-hidden"
     >
       {/* Diagonal scan lines background */}
       <div className="pointer-events-none absolute inset-0 scanlines-diagonal opacity-20" />
@@ -41,11 +41,11 @@ export default function SystemArchLog() {
           transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
         >
           <div className="flex flex-col items-center gap-2 pt-2 shrink-0">
-            <div className="h-px w-10 bg-cyan-galactic" />
-            <div className="w-px h-14 bg-gradient-to-b from-cyan-galactic to-transparent" />
+            <div className="h-px w-10 bg-god-crimson" />
+            <div className="w-px h-14 bg-gradient-to-b from-god-crimson to-transparent" />
           </div>
           <div>
-            <p className="font-mono text-xs tracking-[0.32em] text-cyan-galactic uppercase mb-3 text-glow-cyan">
+            <p className="font-mono text-xs tracking-[0.32em] text-god-crimson uppercase mb-3 text-glow-crimson">
               sys::arch_log — SECTION_02
             </p>
             <h2 className="font-display font-bold text-4xl md:text-6xl text-text-primary leading-tight">
@@ -70,7 +70,7 @@ export default function SystemArchLog() {
         {/* Timeline track */}
         <div className="relative">
           {/* Vertical line */}
-          <div className="absolute left-[1.375rem] top-2 bottom-0 w-px bg-gradient-to-b from-cyan-galactic via-surface-3 to-transparent" />
+          <div className="absolute left-[1.375rem] top-2 bottom-0 w-px bg-gradient-to-b from-god-crimson via-surface-3 to-transparent" />
           <div className="space-y-0">
             {TIMELINE.map((entry, idx) => (
               <TimelineEntry key={entry.id} entry={entry} index={idx} />
@@ -80,14 +80,14 @@ export default function SystemArchLog() {
 
         {/* Academic footer */}
         <motion.div
-          className="mt-14 ml-20 glass-monolith border-l-4 border-cyan-galactic overflow-hidden"
+          className="mt-14 ml-20 glass-monolith border-l-4 border-god-crimson overflow-hidden"
           initial={{ opacity: 0, x: -24 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, margin: '-50px' }}
           transition={{ duration: 0.85, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
         >
           <div className="p-6">
-            <p className="font-mono text-[10px] text-cyan-galactic tracking-[0.28em] mb-2 text-glow-cyan">
+            <p className="font-mono text-[10px] text-god-crimson tracking-[0.28em] mb-2 text-glow-crimson">
               {ACADEMIC_FOOTER.label}
             </p>
             <p className="font-display font-semibold text-text-primary">
