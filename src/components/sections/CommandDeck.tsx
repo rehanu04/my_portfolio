@@ -1,11 +1,12 @@
 import { type RefObject, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { useScrollContext } from '../../context/ScrollContext'
+import { IDENTITY } from '../../data/portfolioContent'
 
 // ─── Animation Variants ────────────────────────────────────────────────────
 
 const STAGGER = {
-  hidden: {},
+  hidden:  {},
   visible: { transition: { staggerChildren: 0.09 } },
 }
 
@@ -27,6 +28,9 @@ export default function CommandDeck() {
   useEffect(() => {
     registerSection('hero', sectionRef as RefObject<HTMLElement>)
   }, [registerSection])
+
+  // Build bio with highlighted spans from IDENTITY data
+  const bioWords  = IDENTITY.bio.split(', ').join(',').split(' ')
 
   return (
     <section
@@ -51,7 +55,7 @@ export default function CommandDeck() {
           <motion.div variants={FADE_UP} className="flex items-center gap-3">
             <div className="h-px w-10 bg-cyan-galactic" />
             <span className="font-mono text-xs tracking-[0.32em] text-cyan-galactic uppercase">
-              sys::portfolio_v2.0 — ONLINE
+              {IDENTITY.systemTag}
             </span>
           </motion.div>
 
@@ -59,13 +63,13 @@ export default function CommandDeck() {
           <motion.div variants={FADE_UP}>
             <h1 className="font-display font-bold leading-none tracking-tight">
               <span className="block text-xl md:text-2xl font-mono font-light text-text-muted mb-2 tracking-[0.18em]">
-                MASTER R LABS //
+                {IDENTITY.labHandle}
               </span>
               <span className="block text-5xl md:text-7xl lg:text-[5.5rem] text-text-primary animate-flicker">
-                MOHAMMED
+                {IDENTITY.displayName.split(' ')[0]}
               </span>
               <span className="block text-5xl md:text-7xl lg:text-[5.5rem] text-cyan-galactic text-glow-cyan">
-                REHAN
+                {IDENTITY.displayName.split(' ')[1]}
               </span>
             </h1>
           </motion.div>
@@ -73,18 +77,21 @@ export default function CommandDeck() {
           {/* Horizontal rule with label */}
           <motion.div variants={FADE_UP} className="flex items-center gap-4">
             <div className="h-px flex-1 bg-gradient-to-r from-cyan-galactic to-transparent" />
-            <span className="font-mono text-xs text-text-muted tracking-widest">AI / ML ENGINEER</span>
+            <span className="font-mono text-xs text-text-muted tracking-widest">{IDENTITY.shortTitle}</span>
           </motion.div>
 
-          {/* Bio */}
+          {/* Bio — highlights auto-rendered from data */}
           <motion.p
             variants={FADE_UP}
             className="font-display text-text-muted text-lg md:text-xl leading-relaxed max-w-lg"
           >
-            Architecting{' '}
-            <span className="text-text-primary">high-fidelity mobile systems</span>,{' '}
-            <span className="text-text-primary">multi-agent orchestration networks</span>, and{' '}
-            <span className="text-text-primary">resource-efficient edge-native AI</span> applications.
+            {IDENTITY.bio.split(IDENTITY.bioHighlights[0])[0]}
+            <span className="text-text-primary">{IDENTITY.bioHighlights[0]}</span>
+            {', '}
+            <span className="text-text-primary">{IDENTITY.bioHighlights[1]}</span>
+            {', and '}
+            <span className="text-text-primary">{IDENTITY.bioHighlights[2]}</span>
+            {' applications.'}
           </motion.p>
 
           {/* CTA row */}
@@ -108,16 +115,12 @@ export default function CommandDeck() {
             </a>
           </motion.div>
 
-          {/* Quick metrics */}
+          {/* Quick metrics — pulled from IDENTITY data */}
           <motion.div
             variants={FADE_UP}
             className="grid grid-cols-3 gap-6 pt-6 border-t border-surface-3"
           >
-            {[
-              { label: 'SYSTEMS', value: '04' },
-              { label: 'UPTIME', value: '99.9%' },
-              { label: 'STACK DEPTH', value: '12+' },
-            ].map((m) => (
+            {IDENTITY.heroMetrics.map((m) => (
               <div key={m.label} className="space-y-1">
                 <p className="font-mono text-[10px] tracking-[0.25em] text-text-muted">{m.label}</p>
                 <p className="font-mono text-2xl text-text-primary font-semibold">{m.value}</p>
@@ -150,7 +153,7 @@ export default function CommandDeck() {
               <div className="scanlines absolute inset-0 z-10 pointer-events-none" />
               <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-surface opacity-75 z-20" />
 
-              {/* Profile placeholder content */}
+              {/* Profile content */}
               <div className="relative z-30 w-full h-full flex flex-col items-center justify-center gap-5">
                 {/* Initials orb */}
                 <div className="w-24 h-24 rounded-full border-2 border-cyan-galactic glow-cyan flex items-center justify-center">
@@ -161,14 +164,14 @@ export default function CommandDeck() {
                   <p className="font-mono text-[10px] tracking-[0.28em] text-cyan-galactic">
                     IDENTITY — VERIFIED
                   </p>
-                  <p className="font-mono text-[10px] text-text-muted opacity-60">
-                    [ HEADSHOT SLOT ]
+                  <p className="font-mono text-[9px] text-text-muted leading-tight max-w-[180px] text-center">
+                    {IDENTITY.titleLine}
                   </p>
                 </div>
 
-                {/* Bio tags */}
+                {/* Bio tags from IDENTITY data */}
                 <div className="flex flex-col gap-1.5 w-full px-6">
-                  {['AI / ML ENGINEER', 'MOBILE ARCHITECT', 'EDGE AI', 'AGENT SYSTEMS'].map((tag) => (
+                  {IDENTITY.profileTags.map((tag) => (
                     <div
                       key={tag}
                       className="flex items-center gap-2 px-3 py-1.5 border border-surface-3"

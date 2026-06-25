@@ -1,102 +1,114 @@
-import { useMemo, useRef } from 'react'
+import { useRef, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useScrollContext } from '../../context/ScrollContext'
 
-const NODE_COUNT       = 60
-const CONNECT_RADIUS   = 5.5
+// ─── Wave-Displaced Vertex Surface ───────────────────────────────────────────
+// A mathematically-driven icosphere with custom GLSL vertex displacement:
+// overlapping sine waves create an organic fluid membrane that breathes and
+// morphs as the user scrolls. The wireframe is rendered at near-zero opacity
+// so it reads as deep-field infrastructure.
 
-/**
- * Interconnected neural-network mesh that becomes visible when the camera
- * dollies through the particle cloud into the experience section.
- */
+const vertexShader = /* glsl */ `
+  uniform float uTime;
+  uniform float uScroll;
+  uniform float uOpacity;
+
+  varying vec3  vNormal;
+  varying float vDisplace;
+  varying float vAlpha;
+
+  // Smooth 3D noise via sin/cos lattice (no texture dependency)
+  float fbm(vec3 p) {
+    float v  = 0.0;
+    float a  = 0.5;
+    vec3  s  = p;
+    for (int i = 0; i < 5; i++) {
+      v += a * sin(s.x) * sin(s.y) * sin(s.z);
+      s  = s * 2.0 + vec3(1.7, 9.2, 3.8);
+      a *= 0.5;
+    }
+    return v;
+  }
+
+  void main() {
+    vNormal = normal;
+
+    // Displacement driven by time + scroll (morphs shape over scroll depth)
+    float amp     = 1.2 + uScroll * 0.8;
+    float disp    = fbm(normal * 2.4 + uTime * 0.22) * amp;
+    vec3  pos     = position + normal * disp;
+    vDisplace     = disp;
+
+    // Distance fade
+    float dist = length(pos) / 18.0;
+    vAlpha = clamp(1.0 - dist * 0.7, 0.0, 1.0) * uOpacity;
+
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+  }
+`
+
+const fragmentShader = /* glsl */ `
+  varying vec3  vNormal;
+  varying float vDisplace;
+  varying float vAlpha;
+
+  void main() {
+    // Tint toward cyan on displaced ridges, deeper slate on troughs
+    float t     = clamp(vDisplace * 0.4 + 0.5, 0.0, 1.0);
+    vec3  cyan  = vec3(0.0,  0.96, 1.0);
+    vec3  slate = vec3(0.12, 0.18, 0.28);
+    vec3  col   = mix(slate, cyan, t * 0.5);
+
+    gl_FragColor = vec4(col, vAlpha * 0.65);
+  }
+`
+
+// ─── Component ────────────────────────────────────────────────────────────────
+
 export default function NeuralMesh() {
-  const groupRef = useRef<THREE.Group>(null)
+  const meshRef = useRef<THREE.Mesh>(null)
   const { scrollState } = useScrollContext()
 
-  const { nodeGeo, nodeMat, lineGeo, lineMat } = useMemo(() => {
-    // ── Generate node positions ─────────────────────────────────────────
-    const nodes: THREE.Vector3[] = Array.from({ length: NODE_COUNT }, () =>
-      new THREE.Vector3(
-        (Math.random() - 0.5) * 32,
-        (Math.random() - 0.5) * 14,
-        (Math.random() - 0.5) * 10,
-      ),
-    )
+  const { geometry, material } = useMemo(() => {
+    // Icosphere: subdivision 4 gives ~2500 triangles — smooth but light
+    const geo = new THREE.IcosahedronGeometry(7.5, 4)
 
-    // ── Node point cloud ────────────────────────────────────────────────
-    const nodePosArr = new Float32Array(NODE_COUNT * 3)
-    nodes.forEach((p, i) => {
-      nodePosArr[i * 3]     = p.x
-      nodePosArr[i * 3 + 1] = p.y
-      nodePosArr[i * 3 + 2] = p.z
-    })
-    const nodeGeo = new THREE.BufferGeometry()
-    nodeGeo.setAttribute('position', new THREE.BufferAttribute(nodePosArr, 3))
-
-    const nodeMat = new THREE.PointsMaterial({
-      color:       0x00f5ff,
-      size:        0.18,
-      transparent: true,
-      opacity:     0,
-      sizeAttenuation: true,
-      blending:    THREE.AdditiveBlending,
-      depthWrite:  false,
+    const mat = new THREE.ShaderMaterial({
+      uniforms: {
+        uTime:    { value: 0 },
+        uScroll:  { value: 0 },
+        uOpacity: { value: 0 },
+      },
+      vertexShader,
+      fragmentShader,
+      transparent:  true,
+      blending:     THREE.AdditiveBlending,
+      depthWrite:   false,
+      side:         THREE.DoubleSide,
+      wireframe:    false,
     })
 
-    // ── Connection lines ────────────────────────────────────────────────
-    const linePositions: number[] = []
-    for (let i = 0; i < NODE_COUNT; i++) {
-      for (let j = i + 1; j < NODE_COUNT; j++) {
-        if (nodes[i].distanceTo(nodes[j]) < CONNECT_RADIUS) {
-          linePositions.push(
-            nodes[i].x, nodes[i].y, nodes[i].z,
-            nodes[j].x, nodes[j].y, nodes[j].z,
-          )
-        }
-      }
-    }
-
-    // Guard: ensure we have at least one degenerate segment
-    const safeArr = linePositions.length > 0
-      ? new Float32Array(linePositions)
-      : new Float32Array([0, 0, 0, 0, 0, 0])
-
-    const lineGeo = new THREE.BufferGeometry()
-    lineGeo.setAttribute('position', new THREE.BufferAttribute(safeArr, 3))
-
-    const lineMat = new THREE.LineBasicMaterial({
-      color:       0x00f5ff,
-      transparent: true,
-      opacity:     0,
-      blending:    THREE.AdditiveBlending,
-    })
-
-    return { nodeGeo, nodeMat, lineGeo, lineMat }
+    return { geometry: geo, material: mat }
   }, [])
 
-  useFrame((state) => {
-    if (!groupRef.current) return
+  useFrame((state, _delta) => {
+    if (!meshRef.current) return
     const time = state.clock.getElapsedTime()
     const { scrollProgress } = scrollState
 
-    // Visible in experience section band: ~0.22 – 0.55 of total scroll
-    const fadeIn  = Math.max(0, Math.min(1, (scrollProgress - 0.2) * 10))
-    const fadeOut = Math.max(0, 1 - Math.max(0, scrollProgress - 0.5) * 10)
-    const presence = fadeIn * fadeOut
+    material.uniforms.uTime.value   = time
+    material.uniforms.uScroll.value = scrollProgress
 
-    nodeMat.opacity = presence * 0.95
-    lineMat.opacity = presence * 0.22
+    // Fade: visible in experience section (0.2 – 0.6 scroll)
+    const fadeIn  = Math.max(0, Math.min(1, (scrollProgress - 0.18) * 8))
+    const fadeOut = Math.max(0, 1 - Math.max(0, scrollProgress - 0.55) * 8)
+    material.uniforms.uOpacity.value = fadeIn * fadeOut * 0.30
 
-    // Slow drift + gentle vertical oscillation
-    groupRef.current.rotation.y  = time * 0.012
-    groupRef.current.position.y  = Math.sin(time * 0.25) * 0.4
+    // Slow organic drift
+    meshRef.current.rotation.y = time * 0.024
+    meshRef.current.rotation.x = time * 0.011
   })
 
-  return (
-    <group ref={groupRef}>
-      <points        geometry={nodeGeo} material={nodeMat} />
-      <lineSegments  geometry={lineGeo} material={lineMat} />
-    </group>
-  )
+  return <mesh ref={meshRef} geometry={geometry} material={material} />
 }

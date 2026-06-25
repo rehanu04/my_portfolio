@@ -1,24 +1,10 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useScrollContext } from '../../context/ScrollContext'
-import type { SectionId } from '../../types'
-
-// ─── Nav items ─────────────────────────────────────────────────────────────
-
-interface NavItem {
-  id: string
-  label: string
-  section: SectionId
-}
-
-const NAV_ITEMS: NavItem[] = [
-  { id: 'command-deck',    label: 'COMMAND DECK', section: 'hero' },
-  { id: 'system-arch-log', label: 'ARCH LOG',    section: 'experience' },
-  { id: 'master-vault',    label: 'VAULT',        section: 'projects' },
-  { id: 'secure-uplink',   label: 'UPLINK',       section: 'contact' },
-]
+import { NAV_ITEMS } from '../../data/portfolioContent'
 
 // ─── Component ─────────────────────────────────────────────────────────────
+
 
 export default function Navigation() {
   const { scrollState } = useScrollContext()

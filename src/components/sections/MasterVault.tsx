@@ -2,99 +2,7 @@ import { type RefObject, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { useScrollContext } from '../../context/ScrollContext'
 import ProjectCard from '../ui/ProjectCard'
-import type { Project } from '../../types'
-
-// ─── Ground-Truth Project Registry ───────────────────────────────────────
-// No hallucinated percentages. Metrics surface factual architectural signals
-// only — no artificial benchmark scores or invented processing times.
-
-const PROJECTS: Project[] = [
-  {
-    id: 'hiresphere',
-    codename: 'PROJ::001',
-    title: 'HireSphere',
-    description:
-      'Flagship native Android AI career platform. Features a Master Vault architecture with dual-source data synchronisation: offline local cache vs. Supabase real-time streams via SharedFlow and WhileSubscribed lifecycle collectors. Integrates an automated real-time voice interview system backed by an agentic reasoning pipeline.',
-    category: 'Native Android · AI Platform',
-    techStack: [
-      { name: 'Kotlin',     category: 'mobile'   },
-      { name: 'Jetpack Compose', category: 'mobile' },
-      { name: 'Supabase',   category: 'infra'    },
-      { name: 'SharedFlow', category: 'mobile'   },
-      { name: 'Gemini AI',  category: 'ai'       },
-      { name: 'Room DB',    category: 'infra'    },
-    ],
-    metrics: [
-      { label: 'Architecture',  value: 'Master Vault', unit: '' },
-      { label: 'Sync Sources',  value: 'Dual',         unit: '' },
-      { label: 'Interview Mode', value: 'Real-Time Voice', unit: '' },
-    ],
-    status: 'ACTIVE',
-  },
-  {
-    id: 'virasat-nama',
-    codename: 'PROJ::002',
-    title: 'Virasat Nama Guide',
-    description:
-      'Extensive, highly scalable education ecosystem and interactive tool built to streamline IELTS examination workflows. Delivers adaptive learning pathways, granular performance analytics, and an offline-first architecture that keeps students productive without a network connection.',
-    category: 'EdTech · Education Ecosystem',
-    techStack: [
-      { name: 'Flutter',        category: 'mobile'  },
-      { name: 'Dart',           category: 'mobile'  },
-      { name: 'Firebase',       category: 'infra'   },
-      { name: 'Hive DB',        category: 'infra'   },
-      { name: 'Provider',       category: 'mobile'  },
-    ],
-    metrics: [
-      { label: 'Target Exam',   value: 'IELTS',       unit: '' },
-      { label: 'Architecture',  value: 'Offline-First', unit: '' },
-      { label: 'Scale',         value: 'Ecosystem',   unit: '' },
-    ],
-    status: 'DEPLOYED',
-  },
-  {
-    id: 'aegis',
-    codename: 'PROJ::003',
-    title: 'AEGIS',
-    description:
-      'Advanced interactive diagnostic utility built to evaluate specialised system performance frameworks. Features configurable assessment pipeline nodes, real-time result streaming, and a rubric-driven scoring engine designed for structured diagnostic workflows.',
-    category: 'Diagnostic · Evaluation Engine',
-    techStack: [
-      { name: 'Python',      category: 'backend'  },
-      { name: 'FastAPI',     category: 'backend'  },
-      { name: 'React',       category: 'frontend' },
-      { name: 'TypeScript',  category: 'frontend' },
-      { name: 'Docker',      category: 'infra'    },
-    ],
-    metrics: [
-      { label: 'Type',         value: 'Diagnostic',   unit: '' },
-      { label: 'Pipeline',     value: 'Configurable', unit: '' },
-      { label: 'Results',      value: 'Real-Time',    unit: '' },
-    ],
-    status: 'OPERATIONAL',
-  },
-  {
-    id: 'jarvis',
-    codename: 'PROJ::004',
-    title: 'Jarvis System Agent',
-    description:
-      'Automated system-level orchestrator built to manage local voice streams, background loops, and system-level task flows. Interprets natural language commands, dispatches OS-level operations across subprocess layers, and maintains autonomous retry logic with configurable wake-word detection.',
-    category: 'AI Agent · System Orchestrator',
-    techStack: [
-      { name: 'Python',   category: 'backend' },
-      { name: 'Whisper',  category: 'ai'      },
-      { name: 'Ollama',   category: 'ai'      },
-      { name: 'PyAudio',  category: 'backend' },
-      { name: 'pyttsx3',  category: 'ai'      },
-    ],
-    metrics: [
-      { label: 'Interface',   value: 'Voice',        unit: '' },
-      { label: 'Execution',   value: 'OS-Level',     unit: '' },
-      { label: 'Loop Mode',   value: 'Autonomous',   unit: '' },
-    ],
-    status: 'OPERATIONAL',
-  },
-]
+import { PROJECTS } from '../../data/portfolioContent'
 
 // ─── Component ─────────────────────────────────────────────────────────────
 
@@ -140,7 +48,7 @@ export default function MasterVault() {
           </div>
         </motion.div>
 
-        {/* 2-column project grid */}
+        {/* 2-column project grid — data from portfolioContent */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {PROJECTS.map((project, idx) => (
             <ProjectCard key={project.id} project={project} index={idx} />
