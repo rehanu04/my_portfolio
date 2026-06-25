@@ -46,8 +46,8 @@ export interface TechTag {
 
 export interface SystemMetric {
   label: string
-  /** 0 – 100 */
-  value: number
+  /** Factual descriptor or numeric value */
+  value: string | number
   unit: string
 }
 

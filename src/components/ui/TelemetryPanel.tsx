@@ -60,10 +60,10 @@ export default function TelemetryPanel({ project, isOpen }: TelemetryPanelProps)
               </div>
             </div>
 
-            {/* System metrics with animated bars */}
+            {/* System metrics */}
             <div>
               <p className="font-mono text-[10px] text-text-muted tracking-[0.28em] mb-3">
-                SYSTEM METRICS
+                ARCHITECTURE SIGNALS
               </p>
               <div className="space-y-3.5">
                 {project.metrics.map((m, i) => (
@@ -71,25 +71,31 @@ export default function TelemetryPanel({ project, isOpen }: TelemetryPanelProps)
                     <div className="flex items-center justify-between">
                       <span className="font-mono text-xs text-text-muted">{m.label}</span>
                       <span className="font-mono text-xs text-cyan-galactic">
-                        {m.value} {m.unit}
+                        {m.value}{m.unit ? ` ${m.unit}` : ''}
                       </span>
                     </div>
-                    <div className="h-1.5 bg-surface-3 rounded-full overflow-hidden">
-                      <motion.div
-                        className="h-full bg-gradient-to-r from-cyan-galactic to-blue-400 rounded-full"
-                        initial={{ width: 0 }}
-                        animate={{ width: `${m.value}%` }}
-                        transition={{
-                          duration: 0.85,
-                          ease: [0.16, 1, 0.3, 1],
-                          delay: i * 0.08,
-                        }}
-                      />
-                    </div>
+                    {typeof m.value === 'number' && (
+                      <div className="h-1.5 bg-surface-3 rounded-full overflow-hidden">
+                        <motion.div
+                          className="h-full bg-gradient-to-r from-cyan-galactic to-blue-400 rounded-full"
+                          initial={{ width: 0 }}
+                          animate={{ width: `${m.value}%` }}
+                          transition={{
+                            duration: 0.85,
+                            ease: [0.16, 1, 0.3, 1],
+                            delay: i * 0.08,
+                          }}
+                        />
+                      </div>
+                    )}
+                    {typeof m.value === 'string' && (
+                      <div className="h-px bg-gradient-to-r from-cyan-galactic/30 to-transparent" />
+                    )}
                   </div>
                 ))}
               </div>
             </div>
+
 
             {/* Architecture note */}
             <div className="p-4 border-l-2 border-cyan-galactic/50 bg-surface-3/40">

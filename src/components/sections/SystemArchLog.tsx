@@ -4,7 +4,10 @@ import { useScrollContext } from '../../context/ScrollContext'
 import TimelineEntry from '../ui/TimelineEntry'
 import type { TimelineEntry as TEntry } from '../../types'
 
-// ─── Data ──────────────────────────────────────────────────────────────────
+// ─── Ground-Truth Timeline ─────────────────────────────────────────────────
+// Profile Identity: Mohammed Rehan — AI/ML Computer Science Engineer
+// specialising in native mobile architectures, agentic workflows, and
+// high-performance system optimisation.
 
 const TIMELINE: TEntry[] = [
   {
@@ -13,17 +16,17 @@ const TIMELINE: TEntry[] = [
     role: 'AI/ML Engineer & Software Architect',
     organization: 'Master R Labs',
     description:
-      'Designing and deploying high-performance multi-agent AI systems, edge-native inference pipelines, and low-latency mobile application architectures. Specialising in LLM orchestration, voice-driven interface engines, and autonomous workflow automation across constrained hardware targets.',
-    tags: ['Multi-Agent Systems', 'Edge AI', 'LLM Orchestration', 'Mobile Architecture'],
+      'Designing and shipping production-grade native Android systems with integrated agentic AI workflows. Specialisms include Kotlin/Jetpack Compose application architecture, multi-source real-time data synchronisation with Supabase and SharedFlow, autonomous voice-driven orchestration, and high-performance system optimisation across constrained hardware targets.',
+    tags: ['Native Android', 'Agentic Workflows', 'System Optimisation', 'Kotlin', 'AI/ML'],
   },
   {
     id: '02',
     period: '2022 — 2023',
-    role: 'Full-Stack Mobile Engineer',
+    role: 'Mobile & Full-Stack Engineer',
     organization: 'Independent Ventures',
     description:
-      'Architected production-grade Flutter and React Native applications with advanced state management patterns. Implemented scalable backend services using FastAPI and Node.js with optimised database schemas for high-throughput data workloads and real-time WebSocket streams.',
-    tags: ['Flutter', 'React Native', 'FastAPI', 'Node.js', 'PostgreSQL'],
+      'Architected scalable Flutter education platforms and Android applications with advanced offline-first state management. Built backend services interfacing Firebase and Supabase with robust real-time listener patterns, lifecycle-aware coroutine scopes, and structured caching strategies for high-throughput workloads.',
+    tags: ['Flutter', 'Kotlin', 'Firebase', 'Supabase', 'Offline-First'],
   },
   {
     id: '03',
@@ -31,16 +34,16 @@ const TIMELINE: TEntry[] = [
     role: 'Computer Science Engineer — AI/ML Track',
     organization: 'Academic Research Division',
     description:
-      'Deep focus on machine learning model optimisation, TensorFlow Lite deployment for on-device inference, and research into resource-efficient neural network architectures for constrained edge hardware environments. Published internal benchmarks on INT8 quantisation pipelines.',
-    tags: ['TensorFlow Lite', 'Model Optimisation', 'Edge Inference', 'Research'],
+      'Deep focus on machine learning model optimisation and on-device inference pipelines. Research into resource-efficient neural architectures for constrained edge hardware, TensorFlow Lite deployment patterns, and INT8 quantisation benchmarking for mobile targets.',
+    tags: ['TensorFlow Lite', 'Edge Inference', 'Model Optimisation', 'Research'],
   },
   {
     id: '04',
     period: '2020 — 2021',
-    role: 'Systems Engineer',
+    role: 'Systems Engineering Foundation',
     organization: 'Engineering Foundation',
     description:
-      'Built foundational systems in data pipeline engineering, RESTful API design, and automation scripting. Developed core competencies in Python ecosystem tooling, CI/CD integration, and containerised deployment workflows using Docker and GitHub Actions.',
+      'Built foundational competencies in data pipeline engineering, RESTful API design, Python ecosystem tooling, CI/CD integration, and containerised deployment workflows — the systems-engineering bedrock underlying all subsequent mobile and AI work.',
     tags: ['Python', 'Docker', 'CI/CD', 'API Design', 'Automation'],
   },
 ]
@@ -84,7 +87,7 @@ export default function SystemArchLog() {
               <span className="font-light text-text-muted">LOG</span>
             </h2>
             <p className="mt-4 text-text-muted font-display text-lg max-w-xl leading-relaxed">
-              Engineering trajectory. An operational record of systems built, protocols designed, and architectures deployed across the stack.
+              Engineering trajectory. An operational record of systems built, protocols designed, and architectures deployed across native mobile, AI, and agent domains.
             </p>
           </div>
         </motion.div>
@@ -113,7 +116,7 @@ export default function SystemArchLog() {
             B.S. Computer Science — AI / ML Specialisation
           </p>
           <p className="font-mono text-sm text-text-muted mt-1">
-            Core tracks: Machine Learning · System Design · Distributed Computing · Data Structures &amp; Algorithms
+            Core tracks: Machine Learning · Native Mobile Architecture · System Design · Agentic Workflow Engineering
           </p>
         </motion.div>
       </div>

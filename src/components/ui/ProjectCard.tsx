@@ -101,23 +101,18 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
             )}
           </div>
 
-          {/* Metric bars */}
+          {/* Metric descriptors — factual architecture signals */}
           <div className="grid grid-cols-3 gap-3 pt-3 border-t border-surface-3">
             {project.metrics.map((m) => (
-              <div key={m.label}>
-                <div className="h-0.5 bg-surface-3 rounded-full mb-1.5 overflow-hidden">
-                  <motion.div
-                    className="h-full bg-cyan-galactic rounded-full"
-                    initial={{ width: 0 }}
-                    whileInView={{ width: `${m.value}%` }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1], delay: 0.35 }}
-                  />
-                </div>
-                <p className="font-mono text-[9px] text-text-muted tracking-wider">{m.label}</p>
+              <div key={m.label} className="flex flex-col gap-1">
+                <p className="font-mono text-[9px] text-text-muted tracking-wider uppercase">{m.label}</p>
+                <p className="font-mono text-[11px] text-cyan-galactic leading-tight font-semibold">
+                  {m.value}{m.unit ? ` ${m.unit}` : ''}
+                </p>
               </div>
             ))}
           </div>
+
 
           {/* Toggle hint */}
           <div className="flex items-center gap-2 pt-1">

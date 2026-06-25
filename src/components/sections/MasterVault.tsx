@@ -4,7 +4,9 @@ import { useScrollContext } from '../../context/ScrollContext'
 import ProjectCard from '../ui/ProjectCard'
 import type { Project } from '../../types'
 
-// ─── Project Registry ─────────────────────────────────────────────────────
+// ─── Ground-Truth Project Registry ───────────────────────────────────────
+// No hallucinated percentages. Metrics surface factual architectural signals
+// only — no artificial benchmark scores or invented processing times.
 
 const PROJECTS: Project[] = [
   {
@@ -12,20 +14,20 @@ const PROJECTS: Project[] = [
     codename: 'PROJ::001',
     title: 'HireSphere',
     description:
-      'Flagship AI career intelligence platform featuring automated voice interview systems, deep architectural vault state management, and real-time candidate-to-role matching via multi-agent reasoning pipelines and dynamic scoring rubrics.',
-    category: 'AI Platform',
+      'Flagship native Android AI career platform. Features a Master Vault architecture with dual-source data synchronisation: offline local cache vs. Supabase real-time streams via SharedFlow and WhileSubscribed lifecycle collectors. Integrates an automated real-time voice interview system backed by an agentic reasoning pipeline.',
+    category: 'Native Android · AI Platform',
     techStack: [
-      { name: 'React Native', category: 'mobile' },
-      { name: 'FastAPI',      category: 'backend' },
-      { name: 'OpenAI GPT-4', category: 'ai' },
-      { name: 'WebRTC',       category: 'frontend' },
-      { name: 'PostgreSQL',   category: 'infra' },
-      { name: 'Redis',        category: 'infra' },
+      { name: 'Kotlin',     category: 'mobile'   },
+      { name: 'Jetpack Compose', category: 'mobile' },
+      { name: 'Supabase',   category: 'infra'    },
+      { name: 'SharedFlow', category: 'mobile'   },
+      { name: 'Gemini AI',  category: 'ai'       },
+      { name: 'Room DB',    category: 'infra'    },
     ],
     metrics: [
-      { label: 'AI Processing', value: 94, unit: '%' },
-      { label: 'Response Time', value: 87, unit: 'ms avg' },
-      { label: 'Match Accuracy', value: 91, unit: '%' },
+      { label: 'Architecture',  value: 'Master Vault', unit: '' },
+      { label: 'Sync Sources',  value: 'Dual',         unit: '' },
+      { label: 'Interview Mode', value: 'Real-Time Voice', unit: '' },
     ],
     status: 'ACTIVE',
   },
@@ -34,19 +36,19 @@ const PROJECTS: Project[] = [
     codename: 'PROJ::002',
     title: 'Virasat Nama Guide',
     description:
-      'Comprehensive, highly scalable educational intelligence system designed for optimised IELTS examination workflows, adaptive learning pathways, granular performance analytics with spaced-repetition algorithms, and offline-first architecture via Hive local storage.',
-    category: 'EdTech System',
+      'Extensive, highly scalable education ecosystem and interactive tool built to streamline IELTS examination workflows. Delivers adaptive learning pathways, granular performance analytics, and an offline-first architecture that keeps students productive without a network connection.',
+    category: 'EdTech · Education Ecosystem',
     techStack: [
-      { name: 'Flutter',          category: 'mobile' },
-      { name: 'Firebase',         category: 'infra' },
-      { name: 'Python',           category: 'backend' },
-      { name: 'TensorFlow Lite',  category: 'ai' },
-      { name: 'Hive DB',          category: 'infra' },
+      { name: 'Flutter',        category: 'mobile'  },
+      { name: 'Dart',           category: 'mobile'  },
+      { name: 'Firebase',       category: 'infra'   },
+      { name: 'Hive DB',        category: 'infra'   },
+      { name: 'Provider',       category: 'mobile'  },
     ],
     metrics: [
-      { label: 'Load Speed',  value: 96, unit: 'ms' },
-      { label: 'Retention',   value: 88, unit: '%' },
-      { label: 'Uptime',      value: 99, unit: '%' },
+      { label: 'Target Exam',   value: 'IELTS',       unit: '' },
+      { label: 'Architecture',  value: 'Offline-First', unit: '' },
+      { label: 'Scale',         value: 'Ecosystem',   unit: '' },
     ],
     status: 'DEPLOYED',
   },
@@ -55,19 +57,19 @@ const PROJECTS: Project[] = [
     codename: 'PROJ::003',
     title: 'AEGIS',
     description:
-      'Advanced interactive evaluation framework built to streamline specialised assessment metric computation, rubric-driven scoring engines, and batch report generation with configurable pipeline nodes, real-time result streaming, and Docker-based deployment isolation.',
-    category: 'Evaluation Engine',
+      'Advanced interactive diagnostic utility built to evaluate specialised system performance frameworks. Features configurable assessment pipeline nodes, real-time result streaming, and a rubric-driven scoring engine designed for structured diagnostic workflows.',
+    category: 'Diagnostic · Evaluation Engine',
     techStack: [
-      { name: 'React',         category: 'frontend' },
-      { name: 'TypeScript',    category: 'frontend' },
-      { name: 'Python',        category: 'backend' },
-      { name: 'scikit-learn',  category: 'ai' },
-      { name: 'Docker',        category: 'infra' },
+      { name: 'Python',      category: 'backend'  },
+      { name: 'FastAPI',     category: 'backend'  },
+      { name: 'React',       category: 'frontend' },
+      { name: 'TypeScript',  category: 'frontend' },
+      { name: 'Docker',      category: 'infra'    },
     ],
     metrics: [
-      { label: 'Throughput', value: 89, unit: 'req/s' },
-      { label: 'Precision',  value: 93, unit: '%' },
-      { label: 'Coverage',   value: 78, unit: '%' },
+      { label: 'Type',         value: 'Diagnostic',   unit: '' },
+      { label: 'Pipeline',     value: 'Configurable', unit: '' },
+      { label: 'Results',      value: 'Real-Time',    unit: '' },
     ],
     status: 'OPERATIONAL',
   },
@@ -76,19 +78,19 @@ const PROJECTS: Project[] = [
     codename: 'PROJ::004',
     title: 'Jarvis System Agent',
     description:
-      'Automated system-level orchestrator built to manage local voice streams, interpret natural language commands, execute OS-level operations across subprocess, and run autonomous background loops with self-healing retry logic and configurable wake-word detection.',
-    category: 'AI Agent System',
+      'Automated system-level orchestrator built to manage local voice streams, background loops, and system-level task flows. Interprets natural language commands, dispatches OS-level operations across subprocess layers, and maintains autonomous retry logic with configurable wake-word detection.',
+    category: 'AI Agent · System Orchestrator',
     techStack: [
       { name: 'Python',   category: 'backend' },
-      { name: 'Whisper',  category: 'ai' },
-      { name: 'OpenAI',   category: 'ai' },
-      { name: 'pyttsx3',  category: 'ai' },
+      { name: 'Whisper',  category: 'ai'      },
+      { name: 'Ollama',   category: 'ai'      },
       { name: 'PyAudio',  category: 'backend' },
+      { name: 'pyttsx3',  category: 'ai'      },
     ],
     metrics: [
-      { label: 'Voice Accuracy', value: 95, unit: '%' },
-      { label: 'Latency',        value: 82, unit: 'ms' },
-      { label: 'Reliability',    value: 97, unit: '%' },
+      { label: 'Interface',   value: 'Voice',        unit: '' },
+      { label: 'Execution',   value: 'OS-Level',     unit: '' },
+      { label: 'Loop Mode',   value: 'Autonomous',   unit: '' },
     ],
     status: 'OPERATIONAL',
   },
@@ -133,7 +135,7 @@ export default function MasterVault() {
               <span className="font-light text-text-muted">VAULT</span>
             </h2>
             <p className="mt-4 text-text-muted font-display text-lg max-w-xl leading-relaxed">
-              Flagship systems registry. Four operational architectures demonstrating high-fidelity engineering across AI, mobile, and agent domains.
+              Four operational systems. Native Android, education ecosystems, diagnostic utilities, and autonomous agent orchestrators — all built for production.
             </p>
           </div>
         </motion.div>

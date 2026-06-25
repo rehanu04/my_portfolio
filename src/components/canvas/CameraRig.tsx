@@ -2,42 +2,98 @@ import { useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useScrollContext } from '../../context/ScrollContext'
-import type { CameraKeyframe } from '../../types'
 
-// ─── Keyframes ─────────────────────────────────────────────────────────────
-// Each keyframe defines where the camera sits for each section boundary.
-// Scroll progress 0 → 0.25 → 0.50 → 0.75 → 1.0
+// ─── Orbital Flight Path ────────────────────────────────────────────────────
+// Instead of simple Z-linear keyframes we define a continuous cubic Hermite
+// spline through four spatial waypoints. The camera orbits in X, sweeps in Y,
+// and retreats along Z simultaneously, creating a cinematic multi-axis flight.
+//
+// SPATIAL COORDINATE PERSISTENCE: all waypoints are kept at large Z distances
+// so geometry from earlier sections remains visible (small, distant) in the
+// background as the camera flies away — never abruptly disappearing.
 
-const KF: Record<string, CameraKeyframe> = {
-  hero: {
-    position: [0, 0, 30],
-    target: [0, 0, 0],
-  },
-  experience: {
-    position: [0, -1, 6],
-    target: [0, -1, 0],
-  },
-  projects: {
-    position: [10, 1, 20],
-    target: [0, 0, 0],
-  },
-  contact: {
-    position: [0, -5, 26],
-    target: [0, -5, 0],
-  },
+interface Waypoint {
+  pos: THREE.Vector3
+  target: THREE.Vector3
 }
 
-function makeVec(t: readonly [number, number, number]): THREE.Vector3 {
-  return new THREE.Vector3(...t)
-}
+// Waypoints ordered by scroll progress 0 → 0.33 → 0.66 → 1.0
+const WAYPOINTS: Waypoint[] = [
+  // 0.00 — Command Deck: front-centre, slightly elevated
+  {
+    pos:    new THREE.Vector3(0,   2, 28),
+    target: new THREE.Vector3(0,   0,  0),
+  },
+  // 0.33 — System Arch Log: camera sweeps left + pulls back on Y
+  {
+    pos:    new THREE.Vector3(-9, -2, 20),
+    target: new THREE.Vector3(-2, -1,  0),
+  },
+  // 0.66 — Master Vault: arc right, ascend, more distant
+  {
+    pos:    new THREE.Vector3(8,   4, 14),
+    target: new THREE.Vector3(2,   1,  0),
+  },
+  // 1.00 — Secure Uplink: sweep back to near-centre, descend, pull far
+  {
+    pos:    new THREE.Vector3(-3, -4, 22),
+    target: new THREE.Vector3(0,  -2,  0),
+  },
+]
 
-function lerpV3(
+// ─── Hermite Interpolation ─────────────────────────────────────────────────
+// Smooth cubic interpolation between two waypoints using their neighbours as
+// tangent guides — creates a "camera on a rail" feel with smooth acceleration.
+
+function hermiteV3(
   out: THREE.Vector3,
-  a: THREE.Vector3,
-  b: THREE.Vector3,
+  p0: THREE.Vector3,
+  p1: THREE.Vector3,
+  p2: THREE.Vector3,
+  p3: THREE.Vector3,
   t: number,
 ): void {
-  out.lerpVectors(a, b, t)
+  // Catmull-Rom tangent factor
+  const tau = 0.5
+  const t2  = t * t
+  const t3  = t2 * t
+
+  // Basis coefficients
+  const h00 =  2 * t3 - 3 * t2 + 1
+  const h10 =      t3 - 2 * t2 + t
+  const h01 = -2 * t3 + 3 * t2
+  const h11 =      t3 -     t2
+
+  // Tangents from Catmull-Rom formula
+  const m0 = p2.clone().sub(p0).multiplyScalar(tau)
+  const m1 = p3.clone().sub(p1).multiplyScalar(tau)
+
+  out
+    .copy(p1)
+    .multiplyScalar(h00)
+    .addScaledVector(m0, h10)
+    .addScaledVector(p2, h01)
+    .addScaledVector(m1, h11)
+}
+
+function samplePath(out: THREE.Vector3, field: 'pos' | 'target', t: number): void {
+  const n    = WAYPOINTS.length - 1
+  const seg  = Math.min(Math.floor(t * n), n - 1)
+  const frac = t * n - seg
+
+  const i0 = Math.max(seg - 1, 0)
+  const i1 = seg
+  const i2 = Math.min(seg + 1, n)
+  const i3 = Math.min(seg + 2, n)
+
+  hermiteV3(
+    out,
+    WAYPOINTS[i0][field],
+    WAYPOINTS[i1][field],
+    WAYPOINTS[i2][field],
+    WAYPOINTS[i3][field],
+    frac,
+  )
 }
 
 // ─── Component ─────────────────────────────────────────────────────────────
@@ -46,40 +102,29 @@ export default function CameraRig() {
   const { camera } = useThree()
   const { scrollState, mousePosition } = useScrollContext()
 
-  const currentPos = useRef(makeVec(KF.hero.position))
-  const currentTarget = useRef(makeVec(KF.hero.target))
-  const desiredPos = useRef(makeVec(KF.hero.position))
-  const desiredTarget = useRef(makeVec(KF.hero.target))
+  // Spring state — separate smoothed position and look-target
+  const currentPos    = useRef(WAYPOINTS[0].pos.clone())
+  const currentTarget = useRef(WAYPOINTS[0].target.clone())
+
+  const desiredPos    = useRef(new THREE.Vector3())
+  const desiredTarget = useRef(new THREE.Vector3())
 
   useFrame((_state, delta) => {
     const { scrollProgress } = scrollState
+    const t = Math.max(0, Math.min(1, scrollProgress))
 
-    // ── Map scroll → camera target position ────────────────────────────────
-    if (scrollProgress <= 0.25) {
-      const t = scrollProgress / 0.25
-      lerpV3(desiredPos.current, makeVec(KF.hero.position), makeVec(KF.experience.position), t)
-      lerpV3(desiredTarget.current, makeVec(KF.hero.target), makeVec(KF.experience.target), t)
-    } else if (scrollProgress <= 0.5) {
-      const t = (scrollProgress - 0.25) / 0.25
-      lerpV3(desiredPos.current, makeVec(KF.experience.position), makeVec(KF.projects.position), t)
-      lerpV3(desiredTarget.current, makeVec(KF.experience.target), makeVec(KF.projects.target), t)
-    } else if (scrollProgress <= 0.75) {
-      const t = (scrollProgress - 0.5) / 0.25
-      lerpV3(desiredPos.current, makeVec(KF.projects.position), makeVec(KF.contact.position), t)
-      lerpV3(desiredTarget.current, makeVec(KF.projects.target), makeVec(KF.contact.target), t)
-    } else {
-      desiredPos.current.copy(makeVec(KF.contact.position))
-      desiredTarget.current.copy(makeVec(KF.contact.target))
-    }
+    // ── Sample the orbital spline at current scroll t ──────────────────────
+    samplePath(desiredPos.current,    'pos',    t)
+    samplePath(desiredTarget.current, 'target', t)
 
-    // ── Hero mouse parallax (fades out as user scrolls) ────────────────────
-    const heroInfluence = Math.max(0, 1 - scrollProgress * 5)
-    desiredPos.current.x += mousePosition.normalizedX * 2.5 * heroInfluence
-    desiredPos.current.y += mousePosition.normalizedY * 1.2 * heroInfluence
+    // ── Hero mouse parallax (decays after first 20 % of page) ─────────────
+    const heroInf = Math.max(0, 1 - t * 5)
+    desiredPos.current.x += mousePosition.normalizedX * 2.2 * heroInf
+    desiredPos.current.y += mousePosition.normalizedY * 1.0 * heroInf
 
-    // ── Frame-rate-independent lerp ────────────────────────────────────────
-    // alpha = 1 - (1 - targetAlpha)^(delta * 60)  → same feel at any FPS
-    const alpha = 1 - Math.pow(0.04, delta)
+    // ── Frame-rate-independent spring (critically-damped feel) ────────────
+    // alpha = 1 - (1 - 0.05)^(delta * 60) → ~5 % per frame at 60 fps
+    const alpha = 1 - Math.pow(0.05, delta)
     currentPos.current.lerp(desiredPos.current, alpha)
     currentTarget.current.lerp(desiredTarget.current, alpha)
 
