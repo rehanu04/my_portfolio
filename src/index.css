@@ -1,3 +1,12 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   src/index.css
+   Ultra Vegito Tier — complete design token system, glassmorphism utilities,
+   spring CSS custom properties, and cinematic keyframe library.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* ─── Google Fonts ─────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -9,6 +18,13 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+  }
+
+  /* Hide native cursor globally — GravWellCursor replaces it */
+  html,
+  body,
+  * {
+    cursor: none !important;
   }
 
   html {
@@ -26,20 +42,13 @@
   }
 
   /* Branded scrollbar */
-  ::-webkit-scrollbar {
-    width: 3px;
-  }
-  ::-webkit-scrollbar-track {
-    background: #0d0f11;
-  }
+  ::-webkit-scrollbar { width: 2px; }
+  ::-webkit-scrollbar-track { background: #0a0c0e; }
   ::-webkit-scrollbar-thumb {
-    background: #00f5ff;
+    background: rgba(0, 245, 255, 0.45);
     border-radius: 2px;
-    opacity: 0.6;
   }
-  ::-webkit-scrollbar-thumb:hover {
-    background: #00f5ff;
-  }
+  ::-webkit-scrollbar-thumb:hover { background: #00f5ff; }
 
   /* Selection highlight */
   ::selection {
@@ -48,53 +57,272 @@
   }
 }
 
+/* ─── CSS Custom Properties (Spring Physics / Glass Cards) ─────────────────── */
+@layer base {
+  :root {
+    /* Card spring physics — set via inline style from @react-spring/web */
+    --card-rotate-x: 0deg;
+    --card-rotate-y: 0deg;
+    /* Specular sheen cursor tracking (percentage within card bounds) */
+    --card-shine-x: 50%;
+    --card-shine-y: 50%;
+    /* Depth token */
+    --depth-hero: 0px;
+    --depth-card: 8px;
+    --depth-title: 16px;
+  }
+}
+
+/* ─── Glassmorphism Utilities ──────────────────────────────────────────────── */
 @layer utilities {
-  /* Glass morphism card surface */
+
+  /* Base glass surface — used on all cards */
   .bg-glass {
     background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
     border: 1px solid rgba(255, 255, 255, 0.07);
   }
 
-  /* Cyan glow box-shadow */
+  /* Deep glass — telemetry panels and expansion drawers */
+  .glass-deep {
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(32px) saturate(120%);
+    -webkit-backdrop-filter: blur(32px) saturate(120%);
+    border: 1px solid rgba(0, 245, 255, 0.08);
+  }
+
+  /* Glass Monolith — the premium card surface with specular refraction */
+  .glass-monolith {
+    position: relative;
+    background:
+      linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.055) 0%,
+        rgba(255, 255, 255, 0.015) 50%,
+        rgba(0, 245, 255, 0.02) 100%
+      );
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    box-shadow:
+      0 4px 32px rgba(0, 0, 0, 0.55),
+      0 1px 0 rgba(255, 255, 255, 0.08) inset,
+      0 0 0 1px rgba(0, 245, 255, 0.04) inset;
+    transform-style: preserve-3d;
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
+  }
+
+  .glass-monolith:hover {
+    border-color: rgba(0, 245, 255, 0.28);
+    box-shadow:
+      0 8px 48px rgba(0, 0, 0, 0.65),
+      0 0 32px rgba(0, 245, 255, 0.08),
+      0 1px 0 rgba(255, 255, 255, 0.12) inset,
+      0 0 0 1px rgba(0, 245, 255, 0.12) inset;
+  }
+
+  /* Specular sheen overlay — cursor-tracking radial gradient */
+  .specular-sheen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(
+      circle at var(--card-shine-x) var(--card-shine-y),
+      rgba(0, 245, 255, 0.10) 0%,
+      rgba(255, 255, 255, 0.04) 30%,
+      transparent 70%
+    );
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+  }
+  .glass-monolith:hover .specular-sheen::before,
+  .glass-monolith:hover.specular-sheen::before {
+    opacity: 1;
+  }
+
+  /* Depth parallax layers inside glass-monolith cards */
+  .depth-layer-title {
+    transform: translateZ(var(--depth-title));
+    transition: transform 0.15s ease;
+  }
+  .depth-layer-card {
+    transform: translateZ(var(--depth-card));
+    transition: transform 0.15s ease;
+  }
+  .depth-layer-base {
+    transform: translateZ(var(--depth-hero));
+  }
+
+  /* ── Glow utilities ───────────────────────────────────────────────────── */
+
   .glow-cyan {
-    box-shadow: 0 0 18px rgba(0, 245, 255, 0.28),
-      0 0 50px rgba(0, 245, 255, 0.08);
+    box-shadow:
+      0 0 18px rgba(0, 245, 255, 0.30),
+      0 0 60px rgba(0, 245, 255, 0.10);
   }
 
   .glow-cyan-sm {
-    box-shadow: 0 0 8px rgba(0, 245, 255, 0.2);
+    box-shadow: 0 0 8px rgba(0, 245, 255, 0.22);
   }
 
-  /* Cyan text glow */
+  .glow-cyan-intense {
+    box-shadow:
+      0 0 30px rgba(0, 245, 255, 0.50),
+      0 0 80px rgba(0, 245, 255, 0.20),
+      0 0 120px rgba(0, 245, 255, 0.08);
+  }
+
   .text-glow-cyan {
-    text-shadow: 0 0 24px rgba(0, 245, 255, 0.5),
-      0 0 60px rgba(0, 245, 255, 0.2);
+    text-shadow:
+      0 0 24px rgba(0, 245, 255, 0.55),
+      0 0 60px rgba(0, 245, 255, 0.22);
   }
 
-  /* Gradient fade mask used on portrait frame bottom */
-  .mask-fade-bottom {
-    mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  .text-glow-white {
+    text-shadow:
+      0 0 20px rgba(255, 255, 255, 0.18),
+      0 0 40px rgba(255, 255, 255, 0.08);
   }
 
-  /* Scanline texture overlay */
+  /* ── Scanline texture ─────────────────────────────────────────────────── */
   .scanlines {
     background-image: repeating-linear-gradient(
       0deg,
       transparent,
       transparent 2px,
-      rgba(0, 245, 255, 0.025) 2px,
-      rgba(0, 245, 255, 0.025) 4px
+      rgba(0, 245, 255, 0.020) 2px,
+      rgba(0, 245, 255, 0.020) 4px
     );
   }
 
-  /* Line-clamp utility (belt-and-suspenders for older Safari) */
+  .scanlines-diagonal {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 6px,
+      rgba(0, 245, 255, 0.012) 6px,
+      rgba(0, 245, 255, 0.012) 7px
+    );
+  }
+
+  /* ── Mask utilities ───────────────────────────────────────────────────── */
+  .mask-fade-bottom {
+    mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  }
+
+  /* ── Line-clamp ───────────────────────────────────────────────────────── */
   .line-clamp-3 {
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* ─── Keyframes ────────────────────────────────────────────────────────────── */
+@layer utilities {
+
+  /* Cursor reticle outer ring rotation */
+  @keyframes reticle-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
+  /* Cursor reticle inner counter-spin */
+  @keyframes reticle-spin-ccw {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(-360deg); }
+  }
+
+  /* Corner bracket draw (SVG stroke animation) */
+  @keyframes bracket-draw {
+    from { stroke-dashoffset: 40; opacity: 0; }
+    to   { stroke-dashoffset: 0;  opacity: 1; }
+  }
+
+  /* Gradient sweep shimmer on glass cards */
+  @keyframes gradient-sweep {
+    0%   { transform: translateX(-100%) skewX(-12deg); }
+    100% { transform: translateX(350%)  skewX(-12deg); }
+  }
+
+  /* Orbiting indicator ring */
+  @keyframes orbit {
+    from { transform: rotate(0deg) translateX(10px) rotate(0deg); }
+    to   { transform: rotate(360deg) translateX(10px) rotate(-360deg); }
+  }
+
+  /* Pulse ring expansion */
+  @keyframes pulse-ring {
+    0%   { transform: scale(1);   opacity: 0.7; }
+    100% { transform: scale(2.2); opacity: 0; }
+  }
+
+  /* Text flicker (hero name) */
+  @keyframes flicker {
+    0%, 89%, 91%, 93%, 100% { opacity: 1; }
+    90%                      { opacity: 0.35; }
+    92%                      { opacity: 0.8; }
+  }
+
+  /* Hero scan line */
+  @keyframes scan {
+    0%   { transform: translateY(-100%); }
+    100% { transform: translateY(100vh); }
+  }
+
+  /* Data pulse travelling along grid lines */
+  @keyframes data-pulse {
+    0%   { opacity: 0; transform: scaleX(0); }
+    50%  { opacity: 1; }
+    100% { opacity: 0; transform: scaleX(1); }
+  }
+
+  /* Conic gradient border spin on profile orb */
+  @keyframes conic-spin {
+    from { --conic-angle: 0deg; }
+    to   { --conic-angle: 360deg; }
+  }
+
+  /* Slow orbital drift */
+  @keyframes pulse-slow {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.4; }
+  }
+
+  /* Cursor blob scale breathe */
+  @keyframes cursor-breathe {
+    0%, 100% { transform: scale(1);    }
+    50%       { transform: scale(1.08); }
+  }
+
+  /* ── Tailwind animation classes ─────────────────────────────────────── */
+  .animate-reticle-spin       { animation: reticle-spin 3s linear infinite; }
+  .animate-reticle-spin-ccw   { animation: reticle-spin-ccw 5s linear infinite; }
+  .animate-bracket-draw       { animation: bracket-draw 0.5s ease forwards; }
+  .animate-gradient-sweep     { animation: gradient-sweep 1.2s ease forwards; }
+  .animate-orbit              { animation: orbit 4s linear infinite; }
+  .animate-pulse-ring         { animation: pulse-ring 1.4s ease-out infinite; }
+  .animate-flicker            { animation: flicker 6s infinite; }
+  .animate-scan               { animation: scan 6s linear infinite; }
+  .animate-pulse-slow         { animation: pulse-slow 4s ease-in-out infinite; }
+  .animate-cursor-breathe     { animation: cursor-breathe 2s ease-in-out infinite; }
+}
+
+/* ─── Card 3D perspective container ───────────────────────────────────────── */
+@layer utilities {
+  .perspective-1200 { perspective: 1200px; }
+  .perspective-800  { perspective: 800px; }
+  .preserve-3d      { transform-style: preserve-3d; }
 }

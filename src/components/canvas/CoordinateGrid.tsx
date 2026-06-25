@@ -1,3 +1,11 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// src/components/canvas/CoordinateGrid.tsx
+//
+// Infinite coordinate grid — always-on at low opacity, swells to full
+// prominence in the contact section.  Animated data-pulse ripples
+// travel outward from the origin along grid lines.
+// ─────────────────────────────────────────────────────────────────────────────
+
 import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
@@ -18,6 +26,8 @@ const vertexShader = /* glsl */ `
 const fragmentShader = /* glsl */ `
   uniform float uTime;
   uniform float uOpacity;
+  uniform float uPulseOriginX;
+  uniform float uPulseOriginZ;
   varying vec2 vWorldXZ;
 
   float gridLine(float coord, float spacing, float thickness) {
@@ -26,21 +36,28 @@ const fragmentShader = /* glsl */ `
   }
 
   void main() {
-    float major = gridLine(vWorldXZ.x, 5.0, 0.06)
-                + gridLine(vWorldXZ.y, 5.0, 0.06);
-    float minor = (gridLine(vWorldXZ.x, 1.0, 0.04)
-                 + gridLine(vWorldXZ.y, 1.0, 0.04)) * 0.28;
+    float major = gridLine(vWorldXZ.x, 5.0, 0.055)
+                + gridLine(vWorldXZ.y, 5.0, 0.055);
+    float minor = (gridLine(vWorldXZ.x, 1.0, 0.038)
+                 + gridLine(vWorldXZ.y, 1.0, 0.038)) * 0.25;
     float grid  = clamp(major + minor, 0.0, 1.0);
 
     // Radial fade — grid dissolves at the horizon
     float dist  = length(vWorldXZ) / 55.0;
-    float fade  = 1.0 - smoothstep(0.25, 1.0, dist);
+    float fade  = 1.0 - smoothstep(0.18, 1.0, dist);
 
-    // Gentle pulse ripple originating from centre
-    float ripple = 0.5 + 0.5 * sin(uTime * 0.55 - length(vWorldXZ) * 0.09);
+    // Slow ambient ripple from centre
+    float ambient = 0.5 + 0.5 * sin(uTime * 0.45 - length(vWorldXZ) * 0.08);
+
+    // Data pulse — fast-travelling wave emanating from uPulseOrigin
+    vec2  pulseOrig = vec2(uPulseOriginX, uPulseOriginZ);
+    float pulseDist = length(vWorldXZ - pulseOrig);
+    float pulse     = max(0.0,
+      1.0 - abs(pulseDist - mod(uTime * 8.0, 60.0)) * 0.4
+    ) * 0.6;
 
     vec3  colour = vec3(0.0, 0.96, 1.0); // Galactic Cyan
-    float alpha  = grid * fade * uOpacity * (0.38 + ripple * 0.12);
+    float alpha  = grid * fade * uOpacity * (0.35 + ambient * 0.10 + pulse);
 
     gl_FragColor = vec4(colour, alpha);
   }
@@ -53,14 +70,15 @@ export default function CoordinateGrid() {
   const { scrollState } = useScrollContext()
 
   const { geometry, material } = useMemo(() => {
-    // Large horizontal plane
     const geo = new THREE.PlaneGeometry(200, 200, 1, 1)
     geo.rotateX(-Math.PI / 2)
 
     const mat = new THREE.ShaderMaterial({
       uniforms: {
-        uTime:    { value: 0 },
-        uOpacity: { value: 0 },
+        uTime:          { value: 0 },
+        uOpacity:       { value: 0.06 },
+        uPulseOriginX:  { value: 0 },
+        uPulseOriginZ:  { value: 0 },
       },
       vertexShader,
       fragmentShader,
@@ -79,12 +97,16 @@ export default function CoordinateGrid() {
 
     material.uniforms.uTime.value = time
 
-    // Fade in during contact section (final 25 % of page)
-    const presence = Math.max(0, Math.min(1, (scrollProgress - 0.72) * 12))
-    material.uniforms.uOpacity.value = presence
+    // Always-on base (0.06) + swells in contact section
+    const contactPresence = Math.max(0, Math.min(1, (scrollProgress - 0.72) * 12))
+    material.uniforms.uOpacity.value = 0.06 + contactPresence * 0.42
 
-    // Very slow drift so it feels alive
-    meshRef.current.position.y = -8 + Math.sin(time * 0.18) * 0.3
+    // Pulse origin drifts slowly for living feel
+    material.uniforms.uPulseOriginX.value = Math.sin(time * 0.15) * 8
+    material.uniforms.uPulseOriginZ.value = Math.cos(time * 0.12) * 6
+
+    // Slight vertical drift
+    meshRef.current.position.y = -8 + Math.sin(time * 0.17) * 0.4
   })
 
   return <mesh ref={meshRef} geometry={geometry} material={material} />

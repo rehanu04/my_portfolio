@@ -1,3 +1,10 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// src/context/ScrollContext.tsx
+//
+// Passive scroll + mouse telemetry provider.
+// Updated to include velocity tracking on mouse position.
+// ─────────────────────────────────────────────────────────────────────────────
+
 import React, {
   createContext,
   useCallback,
@@ -30,6 +37,8 @@ const defaultMouse: MousePosition = {
   y: 0,
   normalizedX: 0,
   normalizedY: 0,
+  velocityX: 0,
+  velocityY: 0,
 }
 
 // ─── Context ───────────────────────────────────────────────────────────────
@@ -50,6 +59,8 @@ export function ScrollProvider({ children }: { children: React.ReactNode }) {
 
   // Map of section id → DOM ref, populated lazily via registerSection
   const sectionRefs = useRef<Partial<Record<SectionId, React.RefObject<HTMLElement>>>>({})
+  // Track last mouse position for velocity
+  const lastMouseRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
 
   const registerSection = useCallback(
     (id: SectionId, ref: React.RefObject<HTMLElement>) => {
@@ -79,7 +90,6 @@ export function ScrollProvider({ children }: { children: React.ReactNode }) {
         const ref = sectionRefs.current[id]
         if (ref?.current) {
           const rect = ref.current.getBoundingClientRect()
-          // 0 when section top is at screen-bottom; 1 when section top is at screen-top
           const progress = Math.max(
             0,
             Math.min(1, (-rect.top + window.innerHeight * 0.5) / rect.height + 0.5),
@@ -96,11 +106,17 @@ export function ScrollProvider({ children }: { children: React.ReactNode }) {
     }
 
     const handleMouseMove = (e: MouseEvent) => {
+      const velocityX = e.clientX - lastMouseRef.current.x
+      const velocityY = e.clientY - lastMouseRef.current.y
+      lastMouseRef.current = { x: e.clientX, y: e.clientY }
+
       setMousePosition({
         x: e.clientX,
         y: e.clientY,
         normalizedX: (e.clientX / window.innerWidth) * 2 - 1,
         normalizedY: -((e.clientY / window.innerHeight) * 2 - 1),
+        velocityX,
+        velocityY,
       })
     }
 

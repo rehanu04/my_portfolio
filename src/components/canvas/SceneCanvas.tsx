@@ -1,6 +1,25 @@
-import { Suspense } from 'react'
-import { Canvas } from '@react-three/fiber'
-import { EffectComposer, Bloom, ChromaticAberration, Vignette } from '@react-three/postprocessing'
+// ─────────────────────────────────────────────────────────────────────────────
+// src/components/canvas/SceneCanvas.tsx
+//
+// Fixed, full-viewport WebGL canvas — z-index:0, pointer-events:none.
+//
+// Post-Processing Pipeline:
+//   1. Selective Bloom  — luminance-threshold 0.60, intensity 1.25
+//      High-intensity glow on Galactic Cyan emissive surfaces
+//   2. Chromatic Aberration — scroll-dynamic offset: larger at hero + contact
+//   3. Vignette           — soft darkening toward corners, focus on centre
+//   4. Noise              — organic cinematic film grain
+// ─────────────────────────────────────────────────────────────────────────────
+
+import { Suspense, useRef } from 'react'
+import { Canvas, useFrame } from '@react-three/fiber'
+import {
+  EffectComposer,
+  Bloom,
+  ChromaticAberration,
+  Vignette,
+  Noise,
+} from '@react-three/postprocessing'
 import { BlendFunction } from 'postprocessing'
 import { Vector2 } from 'three'
 import * as THREE from 'three'
@@ -8,17 +27,68 @@ import CameraRig from './CameraRig'
 import LorenzField from './ParticleCloud'
 import NeuralMesh from './NeuralMesh'
 import CoordinateGrid from './CoordinateGrid'
+import { useScrollContext } from '../../context/ScrollContext'
 
-/**
- * Fixed, full-viewport WebGL canvas.
- * Layer z-index: 0 (behind all HTML content).
- * pointer-events: none — DOM receives all interactions.
- *
- * Post-processing pipeline (R3F v8 compatible):
- *   • Selective Bloom on Galactic Cyan emissive surfaces
- *   • Low-frequency Chromatic Aberration toward viewport bounds
- *   • Cinematic Vignette
- */
+// ─── Dynamic Post-Processing ─────────────────────────────────────────────────
+// Chromatic aberration offset grows at scroll extremes (hero + contact).
+// This inner component reads scroll so it can mutate the effect uniforms
+// inside the R3F render loop.
+
+function DynamicPostProcessing() {
+  const { scrollState } = useScrollContext()
+  const caRef = useRef<{ offset: Vector2 }>(null)
+
+  useFrame(() => {
+    if (!caRef.current) return
+    const p = scrollState.scrollProgress
+    // Bell-curve: max at edges (hero & contact), minimum in the middle
+    const edgeness = Math.max(0, 1 - Math.abs(p - 0.5) * 2.8)
+    // Swap so EDGES are high, centre is low
+    const centerEdge = 1 - edgeness
+    const caStrength = 0.0004 + centerEdge * 0.0012
+    caRef.current.offset.set(caStrength, caStrength)
+  })
+
+  return (
+    <EffectComposer>
+      {/* ── Selective Bloom ────────────────────────────────────────────── */}
+      <Bloom
+        luminanceThreshold={0.60}
+        luminanceSmoothing={0.06}
+        intensity={1.25}
+        blendFunction={BlendFunction.ADD}
+      />
+
+      {/* ── Chromatic Aberration (scroll-dynamic) ────────────────────── */}
+      <ChromaticAberration
+        // @ts-expect-error – ref forwarding is supported but not typed in this version
+        ref={caRef}
+        blendFunction={BlendFunction.NORMAL}
+        offset={new Vector2(0.0008, 0.0008)}
+        radialModulation={false}
+        modulationOffset={0.12}
+      />
+
+      {/* ── Vignette ─────────────────────────────────────────────────── */}
+      <Vignette
+        eskil={false}
+        offset={0.28}
+        darkness={0.75}
+        blendFunction={BlendFunction.NORMAL}
+      />
+
+      {/* ── Film Grain ────────────────────────────────────────────────── */}
+      <Noise
+        premultiply
+        blendFunction={BlendFunction.SOFT_LIGHT}
+        opacity={0.18}
+      />
+    </EffectComposer>
+  )
+}
+
+// ─── Main Canvas ─────────────────────────────────────────────────────────────
+
 export default function SceneCanvas() {
   return (
     <div
@@ -30,13 +100,13 @@ export default function SceneCanvas() {
       }}
     >
       <Canvas
-        camera={{ position: [0, 2.5, 26], fov: 58, near: 0.1, far: 600 }}
+        camera={{ position: [0, 3, 28], fov: 58, near: 0.1, far: 800 }}
         gl={{
           antialias:           true,
           alpha:               true,
           powerPreference:     'high-performance',
           toneMapping:         THREE.ACESFilmicToneMapping,
-          toneMappingExposure: 1.1,
+          toneMappingExposure: 1.15,
         }}
         dpr={[1, 1.5]}
         style={{ background: 'transparent' }}
@@ -44,47 +114,20 @@ export default function SceneCanvas() {
         <Suspense fallback={null}>
           <CameraRig />
 
-          {/* Minimal ambient so scene reads against the dark page */}
+          {/* Minimal ambient — scene reads cleanly against dark page */}
           <ambientLight intensity={0.04} />
 
-          {/* Lorenz attractor — atmospheric, additive, low opacity */}
+          {/* Dual-layer Lorenz attractor — speed-coloured, focal-warp */}
           <LorenzField />
 
-          {/* Wave-displaced morphing sphere — deep field */}
+          {/* Wave-displaced morphing sphere — deep-field spatial persistence */}
           <NeuralMesh />
 
-          {/* Galactic-cyan coordinate grid — fades in on contact section */}
+          {/* Galactic Cyan coordinate grid — always-on, swells in contact */}
           <CoordinateGrid />
 
-          {/* ── Post-Processing Pipeline ─────────────────────────────────── */}
-          <EffectComposer>
-            {/* Selective Bloom: luminance threshold set high so only pure
-                Galactic Cyan (#00F5FF) emissive glows — nothing else blooms */}
-            <Bloom
-              luminanceThreshold={0.72}
-              luminanceSmoothing={0.08}
-              intensity={0.90}
-              blendFunction={BlendFunction.ADD}
-            />
-
-            {/* Chromatic Aberration: very subtle offset toward edges.
-                Gives cinematic lens-distortion without artefact noise. */}
-            <ChromaticAberration
-              blendFunction={BlendFunction.NORMAL}
-              offset={new Vector2(0.0006, 0.0006)}
-              radialModulation={false}
-              modulationOffset={0.15}
-            />
-
-            {/* Vignette: soft darkening toward corners — focuses gaze
-                toward the centre where text lives */}
-            <Vignette
-              eskil={false}
-              offset={0.30}
-              darkness={0.72}
-              blendFunction={BlendFunction.NORMAL}
-            />
-          </EffectComposer>
+          {/* ── Cinematic Post-Processing ────────────────────────────── */}
+          <DynamicPostProcessing />
         </Suspense>
       </Canvas>
     </div>

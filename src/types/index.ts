@@ -1,3 +1,8 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// src/types/index.ts
+// Ground-truth TypeScript interfaces for the entire portfolio runtime.
+// ─────────────────────────────────────────────────────────────────────────────
+
 // ─── Shared Primitive Types ────────────────────────────────────────────────
 
 export type SectionId = 'hero' | 'experience' | 'projects' | 'contact'
@@ -33,6 +38,28 @@ export interface MousePosition {
   normalizedX: number
   /** –1 … +1 vertical, bottom-to-top (WebGL convention) */
   normalizedY: number
+  /** Pixel delta from last frame — x axis */
+  velocityX: number
+  /** Pixel delta from last frame — y axis */
+  velocityY: number
+}
+
+// ─── Cursor / Focal Point ──────────────────────────────────────────────────
+
+/**
+ * World-space focal point emitted when the DOM cursor hovers over a project
+ * card or interactive element. The WebGL shader layer reads this to warp
+ * the Lorenz attractor field toward the active card's spatial position.
+ */
+export interface CursorFocalPoint {
+  /** WebGL-space X coordinate (normalised –1…+1 or raw world units) */
+  x: number
+  /** WebGL-space Y coordinate */
+  y: number
+  /** Active element id for targeted glow — null when idle */
+  targetId: string | null
+  /** Whether the cursor is in telemetry-reticle hover mode */
+  isHovering: boolean
 }
 
 // ─── Project Registry ─────────────────────────────────────────────────────
