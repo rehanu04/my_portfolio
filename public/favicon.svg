@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <rect width="32" height="32" fill="#0D0F11"/>
+  <rect x="4" y="4" width="4" height="4" fill="#00F5FF"/>
+  <rect x="24" y="4" width="4" height="4" fill="#00F5FF"/>
+  <rect x="4" y="24" width="4" height="4" fill="#00F5FF"/>
+  <rect x="24" y="24" width="4" height="4" fill="#00F5FF"/>
+  <text x="16" y="20" text-anchor="middle" font-family="monospace" font-size="10" font-weight="bold" fill="#00F5FF">MR</text>
+</svg>
