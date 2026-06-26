@@ -72,10 +72,12 @@ export function ScrollProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY
-      const totalHeight =
-        document.documentElement.scrollHeight - window.innerHeight
-      const scrollProgress = totalHeight > 0 ? Math.min(1, scrollY / totalHeight) : 0
+      const totalHeight = document.documentElement.scrollHeight - window.innerHeight
+      const rawProgress = totalHeight > 0 ? Math.min(1, scrollY / totalHeight) : 0
 
+      // Map raw scroll to camera flight path and section timelines
+      let cameraProgress = 0
+      let activeSection: SectionId = 'hero'
       const sectionProgress: ScrollState['sectionProgress'] = {
         hero: 0,
         experience: 0,
@@ -83,26 +85,49 @@ export function ScrollProvider({ children }: { children: React.ReactNode }) {
         contact: 0,
       }
 
-      let activeSection: SectionId = 'hero'
-      const ids: SectionId[] = ['hero', 'experience', 'projects', 'contact']
-
-      for (const id of ids) {
-        const ref = sectionRefs.current[id]
-        if (ref?.current) {
-          const rect = ref.current.getBoundingClientRect()
-          const progress = Math.max(
-            0,
-            Math.min(1, (-rect.top + window.innerHeight * 0.5) / rect.height + 0.5),
-          )
-          sectionProgress[id] = progress
-
-          if (rect.top <= window.innerHeight * 0.55 && rect.bottom > 0) {
-            activeSection = id
-          }
-        }
+      if (rawProgress < 0.15) {
+        // Zone 1: Locked on Command Deck
+        cameraProgress = 0.0
+        activeSection = 'hero'
+        sectionProgress.hero = rawProgress / 0.15
+      } else if (rawProgress < 0.30) {
+        // Flight: Hero -> Arch Log
+        const t = (rawProgress - 0.15) / 0.15
+        cameraProgress = t * 0.33
+        activeSection = 'experience'
+      } else if (rawProgress < 0.45) {
+        // Zone 2: Locked on System Arch Log
+        cameraProgress = 0.33
+        activeSection = 'experience'
+        sectionProgress.experience = (rawProgress - 0.30) / 0.15
+      } else if (rawProgress < 0.60) {
+        // Flight: Arch Log -> Vault
+        const t = (rawProgress - 0.45) / 0.15
+        cameraProgress = 0.33 + t * 0.33
+        activeSection = 'projects'
+      } else if (rawProgress < 0.75) {
+        // Zone 3: Locked on Master Vault
+        cameraProgress = 0.66
+        activeSection = 'projects'
+        sectionProgress.projects = (rawProgress - 0.60) / 0.15
+      } else if (rawProgress < 0.90) {
+        // Flight: Vault -> Uplink
+        const t = (rawProgress - 0.75) / 0.15
+        cameraProgress = 0.66 + t * 0.34
+        activeSection = 'contact'
+      } else {
+        // Zone 4: Locked on Secure Uplink
+        cameraProgress = 1.0
+        activeSection = 'contact'
+        sectionProgress.contact = Math.min(1, (rawProgress - 0.90) / 0.10)
       }
 
-      setScrollState({ scrollProgress, scrollY, sectionProgress, activeSection })
+      setScrollState({
+        scrollProgress: cameraProgress, // Pass camera flight to standard scrollProgress
+        scrollY,
+        sectionProgress,
+        activeSection,
+      })
     }
 
     const handleMouseMove = (e: MouseEvent) => {

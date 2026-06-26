@@ -61,6 +61,21 @@ export default function Navigation() {
                 <a
                   href={`#${item.id}`}
                   data-cursor="target"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    // Map section to scroll percentage
+                    let targetScrollPercent = 0
+                    if (item.section === 'hero') targetScrollPercent = 0
+                    if (item.section === 'experience') targetScrollPercent = 0.30
+                    if (item.section === 'projects') targetScrollPercent = 0.60
+                    if (item.section === 'contact') targetScrollPercent = 0.90
+                    
+                    const totalHeight = document.documentElement.scrollHeight - window.innerHeight
+                    window.scrollTo({
+                      top: targetScrollPercent * totalHeight,
+                      behavior: 'smooth'
+                    })
+                  }}
                   className={`font-mono text-xs tracking-[0.22em] transition-colors duration-300 ${
                     active ? 'text-god-crimson text-glow-crimson' : 'text-text-muted hover:text-text-primary'
                   }`}

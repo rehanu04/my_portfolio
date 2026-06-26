@@ -10,6 +10,7 @@
 
 import { type RefObject, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
+import { useSpring, animated } from '@react-spring/web'
 import { useScrollContext } from '../../context/ScrollContext'
 import ProjectCard from '../ui/ProjectCard'
 import { PROJECTS } from '../../data/portfolioContent'
@@ -18,11 +19,13 @@ import { PROJECTS } from '../../data/portfolioContent'
 
 export default function MasterVault() {
   const sectionRef = useRef<HTMLElement>(null)
-  const { registerSection } = useScrollContext()
+  const { scrollState } = useScrollContext()
 
-  useEffect(() => {
-    registerSection('projects', sectionRef as RefObject<HTMLElement>)
-  }, [registerSection])
+  // Animate Y based on local section progress
+  const { ySpring } = useSpring({
+    ySpring: -(scrollState.sectionProgress.projects * 800), // Adjust 800 based on grid height
+    config: { tension: 120, friction: 20 },
+  })
 
   return (
     <section
@@ -33,7 +36,13 @@ export default function MasterVault() {
       {/* Subtle diagonal scan lines */}
       <div className="pointer-events-none absolute inset-0 scanlines opacity-15" />
 
-      <div className="w-full max-w-7xl mx-auto">
+      {/* Animate Y translation based on local section progress */}
+      <animated.div
+        className="w-full max-w-7xl mx-auto"
+        style={{
+          transform: ySpring.to((y) => `translate3d(0, ${y}px, 0)`),
+        }}
+      >
         {/* Section header */}
         <motion.div
           className="mb-16 flex items-start gap-6"
@@ -88,7 +97,7 @@ export default function MasterVault() {
         >
           HOVER EACH CARD → TELEMETRY PANEL ACTIVATES · TILT TO TRAVERSE DEPTH
         </motion.p>
-      </div>
+      </animated.div>
     </section>
   )
 }

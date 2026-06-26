@@ -8,6 +8,7 @@
 
 import { type RefObject, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
+import { useSpring, animated } from '@react-spring/web'
 import { useScrollContext } from '../../context/ScrollContext'
 import TimelineEntry from '../ui/TimelineEntry'
 import { TIMELINE, ACADEMIC_FOOTER } from '../../data/portfolioContent'
@@ -16,22 +17,30 @@ import { TIMELINE, ACADEMIC_FOOTER } from '../../data/portfolioContent'
 
 export default function SystemArchLog() {
   const sectionRef = useRef<HTMLElement>(null)
-  const { registerSection } = useScrollContext()
+  const { scrollState } = useScrollContext()
 
-  useEffect(() => {
-    registerSection('experience', sectionRef as RefObject<HTMLElement>)
-  }, [registerSection])
+  // Animate Y based on local section progress
+  const { ySpring } = useSpring({
+    ySpring: -(scrollState.sectionProgress.experience * 1800), // Adjust 1800 based on timeline height
+    config: { tension: 120, friction: 20 },
+  })
 
   return (
     <section
       id="system-arch-log"
       ref={sectionRef}
-      className="relative w-full h-auto flex items-center px-8 md:px-16 lg:px-24 py-24 overflow-hidden"
+      className="relative w-full h-auto flex items-start px-8 md:px-16 lg:px-24 py-24 overflow-hidden"
     >
       {/* Diagonal scan lines background */}
       <div className="pointer-events-none absolute inset-0 scanlines-diagonal opacity-20" />
 
-      <div className="w-full max-w-7xl mx-auto">
+      {/* Animate Y translation based on local section progress */}
+      <animated.div
+        className="w-full max-w-7xl mx-auto"
+        style={{
+          transform: ySpring.to((y) => `translate3d(0, ${y}px, 0)`),
+        }}
+      >
         {/* Section header with kinetic letter-spacing animation */}
         <motion.div
           className="mb-16 flex items-start gap-6"
@@ -98,7 +107,7 @@ export default function SystemArchLog() {
             </p>
           </div>
         </motion.div>
-      </div>
+      </animated.div>
     </section>
   )
 }

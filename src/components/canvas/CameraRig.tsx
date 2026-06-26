@@ -38,18 +38,18 @@ interface Waypoint {
 const WP: Waypoint[] = [
   // 0.00 — Command Deck: front, slightly elevated, looking at [0,0,0]
   { pos: new THREE.Vector3(  0,   0,   18), target: new THREE.Vector3(  0,   0,   0) },
-  // 0.16 — Mid-arc to Arch Log: sweeping right and down
-  { pos: new THREE.Vector3(  8,  -5,    5), target: new THREE.Vector3(  5,  -5, -10) },
-  // 0.33 — System Arch Log: focused on [15, -10, -25]
-  { pos: new THREE.Vector3( 15, -10,  -10), target: new THREE.Vector3( 15, -10, -25) },
+  // 0.16 — Mid-arc to Arch Log: sweeping right and deep
+  { pos: new THREE.Vector3( 20, -15,  -40), target: new THREE.Vector3( 30, -20,  -60) },
+  // 0.33 — System Arch Log: focused on [40, -30, -100]
+  { pos: new THREE.Vector3( 40, -30,  -85), target: new THREE.Vector3( 40, -30, -100) },
   // 0.50 — Mid-arc to Vault: sweeping left and deeper
-  { pos: new THREE.Vector3( -5, -20,  -25), target: new THREE.Vector3( -10, -20, -40) },
-  // 0.66 — Master Vault: focused on [-20, -30, -60]
-  { pos: new THREE.Vector3(-20, -30,  -45), target: new THREE.Vector3(-20, -30, -60) },
+  { pos: new THREE.Vector3(-10, -45, -175), target: new THREE.Vector3(-30, -50, -200) },
+  // 0.66 — Master Vault: focused on [-60, -60, -250]
+  { pos: new THREE.Vector3(-60, -60, -235), target: new THREE.Vector3(-60, -60, -250) },
   // 0.83 — Mid-arc to Uplink: sweeping right and further down
-  { pos: new THREE.Vector3( -5, -35,  -55), target: new THREE.Vector3(  0, -40, -75) },
-  // 1.00 — Secure Uplink: focused on [10, -45, -90]
-  { pos: new THREE.Vector3( 10, -45,  -75), target: new THREE.Vector3( 10, -45, -90) },
+  { pos: new THREE.Vector3(-15, -75, -325), target: new THREE.Vector3(  5, -80, -360) },
+  // 1.00 — Secure Uplink: focused on [30, -90, -400]
+  { pos: new THREE.Vector3( 30, -90, -385), target: new THREE.Vector3( 30, -90, -400) },
 ]
 
 // ─── Catmull-Rom Hermite interpolation ───────────────────────────────────────

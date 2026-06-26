@@ -149,6 +149,7 @@ export default function GravWellCursor() {
           translateX: '-50%',
           translateY: '-50%',
           transition: 'opacity 0.3s ease',
+          mixBlendMode: 'difference',
         }}
       >
         <animated.div

@@ -30,7 +30,7 @@ export default function SpatialLayout() {
       <Html
         transform
         distanceFactor={12}
-        position={[15, -10, -25]}
+        position={[40, -30, -100]}
         center
         occlude="blending"
       >
@@ -46,7 +46,7 @@ export default function SpatialLayout() {
       <Html
         transform
         distanceFactor={12}
-        position={[-20, -30, -60]}
+        position={[-60, -60, -250]}
         center
         occlude="blending"
       >
@@ -62,7 +62,7 @@ export default function SpatialLayout() {
       <Html
         transform
         distanceFactor={12}
-        position={[10, -45, -90]}
+        position={[30, -90, -400]}
         center
         occlude="blending"
       >
