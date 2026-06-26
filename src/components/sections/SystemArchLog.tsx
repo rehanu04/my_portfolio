@@ -14,7 +14,7 @@ import { TIMELINE, ACADEMIC_FOOTER } from '../../data/portfolioContent'
 
 export default function SystemArchLog() {
   const sectionRef = useRef<HTMLElement>(null)
-  const { registerSection } = useScrollContext()
+  const { registerSection, scrollState } = useScrollContext()
 
   useEffect(() => {
     registerSection('experience', sectionRef as RefObject<HTMLElement>)
@@ -66,41 +66,46 @@ export default function SystemArchLog() {
           </div>
         </motion.div>
 
-        {/* Timeline */}
-        <div className="relative">
-          {/* Vertical track line */}
-          <div className="absolute left-[1.375rem] top-0 bottom-24 w-px bg-gradient-to-b from-god-crimson via-god-crimson/30 to-transparent" />
-          <div className="space-y-0">
-            {TIMELINE.map((entry, idx) => (
-              <TimelineEntry key={entry.id} entry={entry} index={idx} />
-            ))}
-          </div>
-        </div>
+        {/* Timeline Scroll Wrapper */}
+        <div className="relative overflow-hidden w-full" style={{ height: '540px' }}>
+          <div
+            className="space-y-8 pr-4"
+            style={{
+              transform: `translateY(${-scrollState.sectionProgress.experience * 760}px)`,
+              transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+            }}
+          >
+            {/* Timeline */}
+            <div className="relative">
+              {/* Vertical track line */}
+              <div className="absolute left-[1.375rem] top-0 bottom-0 w-px bg-gradient-to-b from-god-crimson via-god-crimson/30 to-transparent" />
+              <div className="space-y-0">
+                {TIMELINE.map((entry, idx) => (
+                  <TimelineEntry key={entry.id} entry={entry} index={idx} />
+                ))}
+              </div>
+            </div>
 
-        {/* Academic foundation card */}
-        <motion.div
-          className="mt-14 ml-14 glass-card overflow-hidden"
-          initial={{ opacity: 0, x: -30 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, margin: '-50px' }}
-          transition={{ duration: 0.85, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <div className="flex items-stretch">
-            {/* Crimson left accent */}
-            <div className="w-1 bg-gradient-to-b from-god-crimson to-god-crimson/20 flex-shrink-0" />
-            <div className="p-6 flex-1">
-              <p className="font-mono text-[9px] text-god-crimson tracking-[0.28em] mb-2 text-glow-crimson">
-                {ACADEMIC_FOOTER.label}
-              </p>
-              <p className="font-display font-semibold text-text-primary text-lg">
-                {ACADEMIC_FOOTER.degree}
-              </p>
-              <p className="font-mono text-sm text-text-muted mt-1 tracking-wide">
-                {ACADEMIC_FOOTER.tracks}
-              </p>
+            {/* Academic foundation card */}
+            <div className="ml-14 glass-card overflow-hidden">
+              <div className="flex items-stretch">
+                {/* Crimson left accent */}
+                <div className="w-1 bg-gradient-to-b from-god-crimson to-god-crimson/20 flex-shrink-0" />
+                <div className="p-6 flex-1">
+                  <p className="font-mono text-[9px] text-god-crimson tracking-[0.28em] mb-2 text-glow-crimson">
+                    {ACADEMIC_FOOTER.label}
+                  </p>
+                  <p className="font-display font-semibold text-text-primary text-lg">
+                    {ACADEMIC_FOOTER.degree}
+                  </p>
+                  <p className="font-mono text-sm text-text-muted mt-1 tracking-wide">
+                    {ACADEMIC_FOOTER.tracks}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
 
       {/* Section divider bottom */}

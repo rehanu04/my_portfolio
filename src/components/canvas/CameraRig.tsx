@@ -1,74 +1,98 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// src/components/canvas/CameraRig.tsx
-//
-// Ambient atmospheric camera — drives parallax on the background EnergyField
-// and CoordinateGrid. It does NOT need to aim at specific section coordinates
-// since sections are now normal DOM elements.
-//
-// Behaviour:
-//   • As user scrolls the page, camera slowly drifts left/right/depth to
-//     create a sense of moving through a 3D environment.
-//   • Mouse position adds subtle parallax on top.
-//   • Camera always looks roughly forward (+Z) so the background
-//     feels immersive without ever obstructing the DOM content.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import { useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useScrollContext } from '../../context/ScrollContext'
 
-// Ambient parallax keyframes keyed to scroll progress 0→1
-// Camera gently drifts through a curved path in the background plane
-const DRIFT: { t: number; x: number; y: number; z: number }[] = [
-  { t: 0.00, x:  0.0, y:  0.0, z: 18 },
-  { t: 0.25, x:  3.0, y: -1.5, z: 16 },
-  { t: 0.50, x: -2.0, y: -3.0, z: 14 },
-  { t: 0.75, x:  4.0, y: -4.5, z: 12 },
-  { t: 1.00, x:  0.0, y: -6.0, z: 10 },
-]
+function easeInOutCubic(t: number): number {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
+}
 
-function lerpDrift(progress: number): THREE.Vector3 {
-  const n = DRIFT.length - 1
-  const raw = Math.min(progress * n, n - 1e-6)
-  const seg = Math.floor(raw)
-  const f   = raw - seg
-  const a   = DRIFT[seg]
-  const b   = DRIFT[Math.min(seg + 1, n)]
-  return new THREE.Vector3(
-    a.x + (b.x - a.x) * f,
-    a.y + (b.y - a.y) * f,
-    a.z + (b.z - a.z) * f,
-  )
+function getCameraPath(p: number) {
+  const pos = new THREE.Vector3()
+  const look = new THREE.Vector3()
+
+  if (p <= 0.15) {
+    // Hero Zone
+    pos.set(0, 0, 15)
+    look.set(0, 0, 0)
+  } else if (p > 0.15 && p < 0.35) {
+    // Flight 1: Hero -> Experience
+    const t = easeInOutCubic((p - 0.15) / 0.20)
+    pos.x = THREE.MathUtils.lerp(0, 8, t)
+    pos.y = THREE.MathUtils.lerp(0, -4, t)
+    pos.z = THREE.MathUtils.lerp(15, -20, t)
+    // Swoop curves
+    pos.x += Math.sin(t * Math.PI) * 4
+    pos.y += Math.sin(t * Math.PI) * 2
+
+    look.x = THREE.MathUtils.lerp(0, 8, t)
+    look.y = THREE.MathUtils.lerp(0, -4, t)
+    look.z = THREE.MathUtils.lerp(0, -35, t)
+  } else if (p >= 0.35 && p <= 0.60) {
+    // Experience Zone
+    pos.set(8, -4, -20)
+    look.set(8, -4, -35)
+  } else if (p > 0.60 && p < 0.75) {
+    // Flight 2: Experience -> Projects
+    const t = easeInOutCubic((p - 0.60) / 0.15)
+    pos.x = THREE.MathUtils.lerp(8, -8, t)
+    pos.y = THREE.MathUtils.lerp(-4, -8, t)
+    pos.z = THREE.MathUtils.lerp(-20, -55, t)
+    // Swoop curves
+    pos.x -= Math.sin(t * Math.PI) * 4
+    pos.y += Math.sin(t * Math.PI) * 3
+
+    look.x = THREE.MathUtils.lerp(8, -8, t)
+    look.y = THREE.MathUtils.lerp(-4, -8, t)
+    look.z = THREE.MathUtils.lerp(-35, -70, t)
+  } else if (p >= 0.75 && p <= 0.92) {
+    // Projects Zone
+    pos.set(-8, -8, -55)
+    look.set(-8, -8, -70)
+  } else if (p > 0.92 && p < 0.97) {
+    // Flight 3: Projects -> Contact
+    const t = easeInOutCubic((p - 0.92) / 0.05)
+    pos.x = THREE.MathUtils.lerp(-8, 4, t)
+    pos.y = THREE.MathUtils.lerp(-8, -12, t)
+    pos.z = THREE.MathUtils.lerp(-55, -90, t)
+    // Swoop curves
+    pos.x += Math.sin(t * Math.PI) * 2
+
+    look.x = THREE.MathUtils.lerp(-8, 4, t)
+    look.y = THREE.MathUtils.lerp(-8, -12, t)
+    look.z = THREE.MathUtils.lerp(-70, -105, t)
+  } else {
+    // Contact Zone
+    pos.set(4, -12, -90)
+    look.set(4, -12, -105)
+  }
+
+  return { pos, look }
 }
 
 export default function CameraRig() {
   const { camera } = useThree()
   const { scrollState, mousePosition } = useScrollContext()
 
-  const currentPos = useRef(new THREE.Vector3(0, 0, 18))
+  const currentPos = useRef(new THREE.Vector3(0, 0, 15))
+  const currentLookAt = useRef(new THREE.Vector3(0, 0, 0))
 
   useFrame((_state, delta) => {
     const raw = Math.max(0, Math.min(1, scrollState.scrollProgress))
 
-    // Ambient drift target
-    const target = lerpDrift(raw)
+    const { pos, look } = getCameraPath(raw)
 
-    // Add gentle mouse parallax
-    target.x += mousePosition.normalizedX * 1.5
-    target.y += mousePosition.normalizedY * 0.7
+    // Add subtle mouse parallax for responsive depth
+    pos.x += mousePosition.normalizedX * 1.2
+    pos.y += mousePosition.normalizedY * 0.6
 
-    // Smooth damped spring
-    const alpha = 1 - Math.pow(0.04, delta)
-    currentPos.current.lerp(target, alpha)
+    // Snappy yet smooth frame interpolation
+    const alpha = 1 - Math.pow(0.01, delta)
+    currentPos.current.lerp(pos, alpha)
+    currentLookAt.current.lerp(look, alpha)
 
     camera.position.copy(currentPos.current)
-    // Always look forward into the scene, slightly angled toward origin
-    camera.lookAt(
-      currentPos.current.x * 0.2,
-      currentPos.current.y * 0.2,
-      0,
-    )
+    camera.lookAt(currentLookAt.current)
   })
 
   return null

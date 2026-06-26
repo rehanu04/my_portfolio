@@ -70,12 +70,12 @@ export function ScrollProvider({ children }: { children: React.ReactNode }) {
   const [scrollState, setScrollState] = useState<ScrollState>(defaultScrollState)
   const [mousePosition, setMousePosition] = useState<MousePosition>(defaultMouse)
 
-  const sectionRefs = useRef<Partial<Record<SectionId, React.RefObject<HTMLElement>>>>({})
   const lastMouseRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
 
   const registerSection = useCallback(
-    (id: SectionId, ref: React.RefObject<HTMLElement>) => {
-      sectionRefs.current[id] = ref
+    (_id: SectionId, _ref: React.RefObject<HTMLElement>) => {
+      // Deterministic calculations based on scrollProgress zones do not need DOM refs.
+      // We keep the signature so we do not break any other components.
     },
     [],
   )
@@ -84,30 +84,26 @@ export function ScrollProvider({ children }: { children: React.ReactNode }) {
     const handleScroll = () => {
       const scrollY = window.scrollY
       const totalHeight = document.documentElement.scrollHeight - window.innerHeight
-      // Linear 0→1 — drives background camera ambient drift
       const scrollProgress = totalHeight > 0 ? Math.min(1, scrollY / totalHeight) : 0
 
-      const sectionProgress: ScrollState['sectionProgress'] = {
-        hero: 0, experience: 0, projects: 0, contact: 0,
+      // Compute activeSection based on midpoint transitions
+      let activeSection: SectionId = 'hero'
+      if (scrollProgress < 0.25) {
+        activeSection = 'hero'
+      } else if (scrollProgress >= 0.25 && scrollProgress < 0.675) {
+        activeSection = 'experience'
+      } else if (scrollProgress >= 0.675 && scrollProgress < 0.945) {
+        activeSection = 'projects'
+      } else {
+        activeSection = 'contact'
       }
 
-      let activeSection: SectionId = 'hero'
-
-      for (const id of SECTION_IDS) {
-        const ref = sectionRefs.current[id]
-        if (ref?.current) {
-          const rect = ref.current.getBoundingClientRect()
-          const progress = Math.max(
-            0,
-            Math.min(1, (-rect.top + window.innerHeight * 0.5) / rect.height),
-          )
-          sectionProgress[id] = progress
-
-          // Section is active when its top half is above midpoint
-          if (rect.top <= window.innerHeight * 0.6 && rect.bottom > window.innerHeight * 0.1) {
-            activeSection = id
-          }
-        }
+      // Compute local progress (0 to 1) for each section zone
+      const sectionProgress: ScrollState['sectionProgress'] = {
+        hero:       Math.max(0, Math.min(1, scrollProgress / 0.15)),
+        experience: Math.max(0, Math.min(1, (scrollProgress - 0.35) / 0.25)),
+        projects:   Math.max(0, Math.min(1, (scrollProgress - 0.75) / 0.17)),
+        contact:    Math.max(0, Math.min(1, (scrollProgress - 0.97) / 0.03)),
       }
 
       setScrollState({ scrollProgress, scrollY, sectionProgress, activeSection })

@@ -20,6 +20,8 @@ import * as THREE from 'three'
 import CameraRig from './CameraRig'
 import StarField from './StarField'
 import EnergyField from './EnergyField'
+import CoordinateGrid from './CoordinateGrid'
+import SpatialLayout from './SpatialLayout'
 import { useScrollContext } from '../../context/ScrollContext'
 
 function DynamicPostProcessing() {
@@ -68,8 +70,8 @@ export default function SceneCanvas() {
       style={{
         position: 'fixed',
         inset: 0,
-        zIndex: 0,
-        pointerEvents: 'none',
+        zIndex: 1, // Set zIndex to 1 to align with HUD overlays
+        pointerEvents: 'auto',
       }}
     >
       <Canvas
@@ -89,6 +91,8 @@ export default function SceneCanvas() {
           <ambientLight intensity={0.02} />
           <StarField />
           <EnergyField />
+          <CoordinateGrid />
+          <SpatialLayout />
           <DynamicPostProcessing />
         </Suspense>
       </Canvas>

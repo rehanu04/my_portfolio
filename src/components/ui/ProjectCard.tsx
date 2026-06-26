@@ -52,12 +52,21 @@ const CARD_SPRING = { tension: 120, friction: 18, mass: 1 }
 interface ProjectCardProps {
   project: Project
   index: number
+  onClick?: () => void
+  showTelemetryInline?: boolean
+  defaultTelemetryOpen?: boolean
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export default function ProjectCard({ project, index }: ProjectCardProps) {
-  const [telemetryOpen, setTelemetryOpen] = useState(false)
+export default function ProjectCard({
+  project,
+  index,
+  onClick,
+  showTelemetryInline = true,
+  defaultTelemetryOpen = false,
+}: ProjectCardProps) {
+  const [telemetryOpen, setTelemetryOpen] = useState(defaultTelemetryOpen)
   const [isHovered, setIsHovered] = useState(false)
   const cardRef = useRef<HTMLDivElement>(null)
   const { setFocalPoint, clearFocalPoint } = useCursorContext()
@@ -138,7 +147,13 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
         onMouseMove={handleMouseMove}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        onClick={() => setTelemetryOpen((v) => !v)}
+        onClick={(e) => {
+          if (onClick) {
+            onClick()
+          } else {
+            setTelemetryOpen((v) => !v)
+          }
+        }}
       >
         {/* Shimmer sweep on hover */}
         {isHovered && (
@@ -245,7 +260,7 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
       </animated.div>
 
       {/* Slide-out telemetry panel */}
-      <TelemetryPanel project={project} isOpen={telemetryOpen} />
+      {showTelemetryInline && <TelemetryPanel project={project} isOpen={telemetryOpen} />}
     </motion.div>
   )
 }

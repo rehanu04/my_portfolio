@@ -64,12 +64,17 @@ export default function Navigation() {
                   data-cursor="target"
                   onClick={(e) => {
                     e.preventDefault()
-                    // Scroll to the real DOM section
-                    const domId = SECTION_DOM_IDS[item.section]
-                    const el = document.getElementById(domId)
-                    if (el) {
-                      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                    const targets: Record<typeof item.section, number> = {
+                      hero:       0.0,
+                      experience: 0.475,
+                      projects:   0.835,
+                      contact:    0.985,
                     }
+                    const totalHeight = document.documentElement.scrollHeight - window.innerHeight
+                    window.scrollTo({
+                      top: targets[item.section] * totalHeight,
+                      behavior: 'smooth',
+                    })
                   }}
                   className={`font-mono text-xs tracking-[0.22em] transition-colors duration-300 ${
                     active ? 'text-god-crimson text-glow-crimson' : 'text-text-muted hover:text-text-primary'
