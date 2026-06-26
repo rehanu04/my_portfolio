@@ -1,22 +1,11 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // src/context/ScrollContext.tsx
 //
-// Master Timeline Scroll Engine
+// Passive scroll + mouse telemetry provider.
 //
-// Maps raw window.scrollY into a tiered zone system:
-//   • Section Zones  → camera LOCKED at section waypoint; sectionProgress
-//     drives internal content animation (Y-translate within the Html node).
-//   • Flight Zones   → camera interpolates between waypoints along spline.
-//
-// Total scroll height: 1000vh (App.tsx spacer).
-// Zone map (in raw 0→1 progress):
-//   0.00 – 0.12  Hero lock          (sectionProgress.hero    0→1)
-//   0.12 – 0.22  Flight 1: Hero→Log (camera 0.00→0.33)
-//   0.22 – 0.44  Arch Log lock      (sectionProgress.experience 0→1)
-//   0.44 – 0.54  Flight 2: Log→Vault (camera 0.33→0.66)
-//   0.54 – 0.76  Vault lock         (sectionProgress.projects 0→1)
-//   0.76 – 0.86  Flight 3: Vault→Uplink (camera 0.66→1.00)
-//   0.86 – 1.00  Uplink lock        (sectionProgress.contact 0→1)
+// Now that sections are normal DOM elements, scroll is linear and natural.
+// scrollProgress (0→1) drives the background camera ambient drift.
+// activeSection is computed by viewport intersection for nav highlighting.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import React, {
@@ -65,19 +54,15 @@ const ScrollContext = createContext<ScrollContextValue>({
 
 export const useScrollContext = () => useContext(ScrollContext)
 
-// ─── Zone Boundaries ───────────────────────────────────────────────────────
-// Keep these in one place so Navigation.tsx can reference them too.
+// ─── Exported zone constants (used by Navigation for snap-scroll) ──────────
 
-export const SCROLL_ZONES = {
-  HERO_LOCK_START:    0.00,
-  HERO_LOCK_END:      0.12,
-  FLIGHT_1_END:       0.22,  // camera arrives at Arch Log
-  ARCH_LOCK_END:      0.44,
-  FLIGHT_2_END:       0.54,  // camera arrives at Vault
-  VAULT_LOCK_END:     0.76,
-  FLIGHT_3_END:       0.86,  // camera arrives at Uplink
-  UPLINK_LOCK_END:    1.00,
-} as const
+export const SECTION_IDS: SectionId[] = ['hero', 'experience', 'projects', 'contact']
+export const SECTION_DOM_IDS: Record<SectionId, string> = {
+  hero:       'command-deck',
+  experience: 'system-arch-log',
+  projects:   'master-vault',
+  contact:    'secure-uplink',
+}
 
 // ─── Provider ──────────────────────────────────────────────────────────────
 
@@ -96,66 +81,36 @@ export function ScrollProvider({ children }: { children: React.ReactNode }) {
   )
 
   useEffect(() => {
-    const Z = SCROLL_ZONES
-
     const handleScroll = () => {
       const scrollY = window.scrollY
       const totalHeight = document.documentElement.scrollHeight - window.innerHeight
-      const raw = totalHeight > 0 ? Math.min(1, scrollY / totalHeight) : 0
+      // Linear 0→1 — drives background camera ambient drift
+      const scrollProgress = totalHeight > 0 ? Math.min(1, scrollY / totalHeight) : 0
 
-      let cameraProgress = 0
-      let activeSection: SectionId = 'hero'
       const sectionProgress: ScrollState['sectionProgress'] = {
         hero: 0, experience: 0, projects: 0, contact: 0,
       }
 
-      // ── Zone 1: Command Deck locked ──────────────────────────────────────
-      if (raw < Z.HERO_LOCK_END) {
-        cameraProgress = 0.0
-        activeSection = 'hero'
-        sectionProgress.hero = raw / Z.HERO_LOCK_END
+      let activeSection: SectionId = 'hero'
 
-      // ── Flight 1: Hero → Arch Log ─────────────────────────────────────────
-      } else if (raw < Z.FLIGHT_1_END) {
-        const t = (raw - Z.HERO_LOCK_END) / (Z.FLIGHT_1_END - Z.HERO_LOCK_END)
-        cameraProgress = t * 0.33
-        activeSection = 'experience'
-        sectionProgress.experience = 0
+      for (const id of SECTION_IDS) {
+        const ref = sectionRefs.current[id]
+        if (ref?.current) {
+          const rect = ref.current.getBoundingClientRect()
+          const progress = Math.max(
+            0,
+            Math.min(1, (-rect.top + window.innerHeight * 0.5) / rect.height),
+          )
+          sectionProgress[id] = progress
 
-      // ── Zone 2: System Arch Log locked ───────────────────────────────────
-      } else if (raw < Z.ARCH_LOCK_END) {
-        cameraProgress = 0.33
-        activeSection = 'experience'
-        sectionProgress.experience = (raw - Z.FLIGHT_1_END) / (Z.ARCH_LOCK_END - Z.FLIGHT_1_END)
-
-      // ── Flight 2: Arch Log → Vault ────────────────────────────────────────
-      } else if (raw < Z.FLIGHT_2_END) {
-        const t = (raw - Z.ARCH_LOCK_END) / (Z.FLIGHT_2_END - Z.ARCH_LOCK_END)
-        cameraProgress = 0.33 + t * 0.33
-        activeSection = 'projects'
-        sectionProgress.projects = 0
-
-      // ── Zone 3: Master Vault locked ───────────────────────────────────────
-      } else if (raw < Z.VAULT_LOCK_END) {
-        cameraProgress = 0.66
-        activeSection = 'projects'
-        sectionProgress.projects = (raw - Z.FLIGHT_2_END) / (Z.VAULT_LOCK_END - Z.FLIGHT_2_END)
-
-      // ── Flight 3: Vault → Uplink ──────────────────────────────────────────
-      } else if (raw < Z.FLIGHT_3_END) {
-        const t = (raw - Z.VAULT_LOCK_END) / (Z.FLIGHT_3_END - Z.VAULT_LOCK_END)
-        cameraProgress = 0.66 + t * 0.34
-        activeSection = 'contact'
-        sectionProgress.contact = 0
-
-      // ── Zone 4: Secure Uplink locked ──────────────────────────────────────
-      } else {
-        cameraProgress = 1.0
-        activeSection = 'contact'
-        sectionProgress.contact = Math.min(1, (raw - Z.FLIGHT_3_END) / (Z.UPLINK_LOCK_END - Z.FLIGHT_3_END))
+          // Section is active when its top half is above midpoint
+          if (rect.top <= window.innerHeight * 0.6 && rect.bottom > window.innerHeight * 0.1) {
+            activeSection = id
+          }
+        }
       }
 
-      setScrollState({ scrollProgress: cameraProgress, scrollY, sectionProgress, activeSection })
+      setScrollState({ scrollProgress, scrollY, sectionProgress, activeSection })
     }
 
     const handleMouseMove = (e: MouseEvent) => {

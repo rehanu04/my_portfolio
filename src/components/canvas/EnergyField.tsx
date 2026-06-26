@@ -173,8 +173,8 @@ export default function EnergyField() {
   const { focalPoint } = useCursorContext()
 
   const { geometry, material } = useMemo(() => {
-    // Large heavily-subdivided plane for smooth vertex displacement
-    const geo = new THREE.PlaneGeometry(100, 100, 200, 200)
+    // Larger plane — always fills background as camera drifts through ambient positions
+    const geo = new THREE.PlaneGeometry(200, 200, 180, 180)
 
     const mat = new THREE.ShaderMaterial({
       uniforms: {
@@ -218,7 +218,7 @@ export default function EnergyField() {
       ref={meshRef} 
       geometry={geometry} 
       material={material} 
-      position={[0, 0, -20]} 
+      position={[0, 0, -8]}
     />
   )
 }

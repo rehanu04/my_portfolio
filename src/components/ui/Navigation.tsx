@@ -2,16 +2,14 @@
 // src/components/ui/Navigation.tsx
 //
 // Fixed nav with glassmorphism backdrop on scroll.
-// data-cursor="target" on all interactive elements.
-// Active section indicator with spring-animated underline.
+// Active section tracked from ScrollContext (viewport intersection).
+// Nav clicks scroll to the real DOM section element by ID.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useScrollContext, SCROLL_ZONES } from '../../context/ScrollContext'
+import { useScrollContext, SECTION_DOM_IDS } from '../../context/ScrollContext'
 import { NAV_ITEMS } from '../../data/portfolioContent'
-
-// ─── Component ─────────────────────────────────────────────────────────────
 
 export default function Navigation() {
   const { scrollState } = useScrollContext()
@@ -35,14 +33,17 @@ export default function Navigation() {
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
     >
-      {/* Top glint line */}
       {scrolled && (
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-god-crimson/30 to-transparent" />
       )}
 
       <div className="max-w-7xl mx-auto px-8 md:px-16 h-16 flex items-center justify-between">
         {/* Logo mark */}
-        <div className="flex items-center gap-2.5" data-cursor="target">
+        <div
+          className="flex items-center gap-2.5 cursor-pointer"
+          data-cursor="target"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        >
           <div className="relative w-2.5 h-2.5">
             <div className="w-2.5 h-2.5 bg-god-crimson rounded-full animate-pulse-slow" />
             <div className="absolute inset-0 rounded-full bg-god-crimson opacity-40 animate-pulse-ring" />
@@ -52,7 +53,7 @@ export default function Navigation() {
           </span>
         </div>
 
-        {/* Nav links (desktop) */}
+        {/* Nav links */}
         <ul className="hidden md:flex items-center gap-8 list-none" role="list">
           {NAV_ITEMS.map((item) => {
             const active = scrollState.activeSection === item.section
@@ -63,16 +64,12 @@ export default function Navigation() {
                   data-cursor="target"
                   onClick={(e) => {
                     e.preventDefault()
-                    // Snap to the start of each section's locked zone
-                    const sectionMap: Record<string, number> = {
-                      hero:       SCROLL_ZONES.HERO_LOCK_START,
-                      experience: SCROLL_ZONES.FLIGHT_1_END,    // start of Arch Log lock
-                      projects:   SCROLL_ZONES.FLIGHT_2_END,    // start of Vault lock
-                      contact:    SCROLL_ZONES.FLIGHT_3_END,    // start of Uplink lock
+                    // Scroll to the real DOM section
+                    const domId = SECTION_DOM_IDS[item.section]
+                    const el = document.getElementById(domId)
+                    if (el) {
+                      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
                     }
-                    const target = sectionMap[item.section] ?? 0
-                    const totalHeight = document.documentElement.scrollHeight - window.innerHeight
-                    window.scrollTo({ top: target * totalHeight, behavior: 'smooth' })
                   }}
                   className={`font-mono text-xs tracking-[0.22em] transition-colors duration-300 ${
                     active ? 'text-god-crimson text-glow-crimson' : 'text-text-muted hover:text-text-primary'
