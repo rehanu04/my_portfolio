@@ -8,7 +8,7 @@
 
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useScrollContext } from '../../context/ScrollContext'
+import { useScrollContext, SCROLL_ZONES } from '../../context/ScrollContext'
 import { NAV_ITEMS } from '../../data/portfolioContent'
 
 // ─── Component ─────────────────────────────────────────────────────────────
@@ -63,18 +63,16 @@ export default function Navigation() {
                   data-cursor="target"
                   onClick={(e) => {
                     e.preventDefault()
-                    // Map section to scroll percentage
-                    let targetScrollPercent = 0
-                    if (item.section === 'hero') targetScrollPercent = 0
-                    if (item.section === 'experience') targetScrollPercent = 0.30
-                    if (item.section === 'projects') targetScrollPercent = 0.60
-                    if (item.section === 'contact') targetScrollPercent = 0.90
-                    
+                    // Snap to the start of each section's locked zone
+                    const sectionMap: Record<string, number> = {
+                      hero:       SCROLL_ZONES.HERO_LOCK_START,
+                      experience: SCROLL_ZONES.FLIGHT_1_END,    // start of Arch Log lock
+                      projects:   SCROLL_ZONES.FLIGHT_2_END,    // start of Vault lock
+                      contact:    SCROLL_ZONES.FLIGHT_3_END,    // start of Uplink lock
+                    }
+                    const target = sectionMap[item.section] ?? 0
                     const totalHeight = document.documentElement.scrollHeight - window.innerHeight
-                    window.scrollTo({
-                      top: targetScrollPercent * totalHeight,
-                      behavior: 'smooth'
-                    })
+                    window.scrollTo({ top: target * totalHeight, behavior: 'smooth' })
                   }}
                   className={`font-mono text-xs tracking-[0.22em] transition-colors duration-300 ${
                     active ? 'text-god-crimson text-glow-crimson' : 'text-text-muted hover:text-text-primary'

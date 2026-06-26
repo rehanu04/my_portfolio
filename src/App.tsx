@@ -33,8 +33,8 @@ export default function App() {
           <Navigation />
         </div>
 
-        {/* Dummy scroll container to drive ScrollContext (5 sections * 100vh = 500vh) */}
-        <div style={{ height: '500vh', width: '100%', position: 'absolute', top: 0, zIndex: 1, pointerEvents: 'none' }} />
+        {/* Scroll driver: 1000vh total — gives each section ~220vh of lock zone */}
+        <div style={{ height: '1000vh', width: '100%', position: 'absolute', top: 0, zIndex: 1, pointerEvents: 'none' }} />
       </ScrollProvider>
     </CursorProvider>
   )

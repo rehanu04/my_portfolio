@@ -4,23 +4,27 @@
 // Ultra Vegito Multi-Axis Orbital Camera Rig
 //
 // ┌────────────────────────────────────────────────────────────────────────┐
-// │  7 cinematic waypoints — sweeping X-pans (±14 units), deep Z-dollies  │
-// │  (range –8 to +28), aggressive Y-tilts                                │
-// │  Catmull-Rom Hermite spline for smooth non-linear orbital paths        │
-// │  Critically-damped spring physics (FPS-independent)                   │
-// │  Mouse parallax persists 40% influence throughout full scroll          │
-// │  Spatial Coordinate Persistence — past sections remain visible         │
-// │  in deep Z space; camera never wipes geometry from view               │
+// │  4 cinematic section waypoints + 3 inter-section flight waypoints      │
+// │  Camera always arrives 15 units in front of each section panel         │
+// │  Catmull-Rom Hermite spline for smooth non-linear orbital paths         │
+// │  Critically-damped spring physics (FPS-independent)                     │
+// │  Mouse parallax persists 30% influence throughout full scroll           │
 // └────────────────────────────────────────────────────────────────────────┘
 //
-// Waypoints (scroll 0.0 → 1.0):
-//   0.00  Command Deck       — front, elevated gaze into the void
-//   0.16  Mid-hero sweep     — aggressive left pan, pull-back
-//   0.33  Arch Log arc       — barrel-right, deep Z plunge
-//   0.50  Arch-Log peak      — arcing high, maximum roll
-//   0.66  Master Vault       — orbital high-right, maximum depth
-//   0.83  Vault apex         — sweeping counter-left with Y tilt
-//   1.00  Secure Uplink      — returns near-centre from far distance
+// Section world positions (from SpatialLayout):
+//   Command Deck:    [0,  0,   0]
+//   System Arch Log: [8, -4, -35]
+//   Master Vault:    [-8, -8, -70]
+//   Secure Uplink:   [4, -12, -105]
+//
+// Matching camera waypoints (15 units forward on Z from each section):
+//   WP[0] Hero:    pos=[0,  0,  15] look=[0,  0,   0]
+//   WP[2] ArchLog: pos=[8, -4, -20] look=[8, -4, -35]
+//   WP[4] Vault:   pos=[-8,-8, -55] look=[-8,-8, -70]
+//   WP[6] Uplink:  pos=[4,-12, -90] look=[4,-12,-105]
+//
+// Inter-section flight arcs (WP[1], WP[3], WP[5]) sweep dramatically
+// off-axis to sell the sense of traversing 3D space.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useRef } from 'react'
@@ -36,20 +40,26 @@ interface Waypoint {
 }
 
 const WP: Waypoint[] = [
-  // 0.00 — Command Deck: front, slightly elevated, looking at [0,0,0]
-  { pos: new THREE.Vector3(  0,   0,   18), target: new THREE.Vector3(  0,   0,   0) },
-  // 0.16 — Mid-arc to Arch Log: sweeping right and deep
-  { pos: new THREE.Vector3( 20, -15,  -40), target: new THREE.Vector3( 30, -20,  -60) },
-  // 0.33 — System Arch Log: focused on [40, -30, -100]
-  { pos: new THREE.Vector3( 40, -30,  -85), target: new THREE.Vector3( 40, -30, -100) },
-  // 0.50 — Mid-arc to Vault: sweeping left and deeper
-  { pos: new THREE.Vector3(-10, -45, -175), target: new THREE.Vector3(-30, -50, -200) },
-  // 0.66 — Master Vault: focused on [-60, -60, -250]
-  { pos: new THREE.Vector3(-60, -60, -235), target: new THREE.Vector3(-60, -60, -250) },
-  // 0.83 — Mid-arc to Uplink: sweeping right and further down
-  { pos: new THREE.Vector3(-15, -75, -325), target: new THREE.Vector3(  5, -80, -360) },
-  // 1.00 — Secure Uplink: focused on [30, -90, -400]
-  { pos: new THREE.Vector3( 30, -90, -385), target: new THREE.Vector3( 30, -90, -400) },
+  // 0.00 — Command Deck: dead-on, 15 units out, looking at [0,0,0]
+  { pos: new THREE.Vector3( 0,   0,  15), target: new THREE.Vector3(  0,   0,   0) },
+
+  // 0.16 — Cinematic fly-through arc to Arch Log: barrel right and pull back
+  { pos: new THREE.Vector3(14,  -2,  -2), target: new THREE.Vector3(  8,  -3, -15) },
+
+  // 0.33 — System Arch Log locked: 15 units out, facing [8,-4,-35]
+  { pos: new THREE.Vector3( 8,  -4, -20), target: new THREE.Vector3(  8,  -4, -35) },
+
+  // 0.50 — Cinematic arc to Vault: sweep hard left and dive
+  { pos: new THREE.Vector3(-4, -6,  -42), target: new THREE.Vector3( -6,  -7, -55) },
+
+  // 0.66 — Master Vault locked: 15 units out, facing [-8,-8,-70]
+  { pos: new THREE.Vector3(-8,  -8, -55), target: new THREE.Vector3( -8,  -8, -70) },
+
+  // 0.83 — Cinematic arc to Uplink: sweep right and continue descent
+  { pos: new THREE.Vector3( 6, -10, -77), target: new THREE.Vector3(  4, -11, -90) },
+
+  // 1.00 — Secure Uplink locked: 15 units out, facing [4,-12,-105]
+  { pos: new THREE.Vector3( 4, -12, -90), target: new THREE.Vector3(  4, -12,-105) },
 ]
 
 // ─── Catmull-Rom Hermite interpolation ───────────────────────────────────────
@@ -122,13 +132,14 @@ export default function CameraRig() {
     sampleSpline(desiredPos.current,    'pos',    t)
     sampleSpline(desiredTarget.current, 'target', t)
 
-    // Mouse parallax — 100% influence at hero, 40% minimum throughout scroll
-    const parallaxDecay  = 1 - raw * 0.6          // 1.0 → 0.4 across full page
-    desiredPos.current.x += mousePosition.normalizedX * 2.2 * parallaxDecay
-    desiredPos.current.y += mousePosition.normalizedY * 1.0 * parallaxDecay
+    // Mouse parallax — 60% at hero, decays to 20% at deep sections
+    // Kept subtle so it doesn't push the camera off-axis from the content
+    const parallaxDecay  = 1 - raw * 0.65          // 1.0 → 0.35 across full scroll
+    desiredPos.current.x += mousePosition.normalizedX * 1.2 * parallaxDecay
+    desiredPos.current.y += mousePosition.normalizedY * 0.5 * parallaxDecay
 
-    // Critically-damped spring: λ = 0.048 → ~130ms half-life
-    const alpha = 1 - Math.pow(0.048, delta)
+    // Critically-damped spring: fast settle → ~80ms half-life
+    const alpha = 1 - Math.pow(0.035, delta)
     currentPos.current.lerp(desiredPos.current, alpha)
     currentTarget.current.lerp(desiredTarget.current, alpha)
 

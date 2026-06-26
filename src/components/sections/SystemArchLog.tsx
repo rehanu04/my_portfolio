@@ -4,49 +4,56 @@
 // Architecture timeline with diagonal scan-line background,
 // glassmorphism card wrappers on each TimelineEntry,
 // and kinetic section header with letter-spacing animation.
+//
+// Inner-section progress: sectionProgress.experience (0→1) from ScrollContext
+// drives a smooth upward Y-translate so all timeline cards become accessible
+// while the camera remains locked at the Arch Log waypoint.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { type RefObject, useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import { motion } from 'framer-motion'
 import { useSpring, animated } from '@react-spring/web'
 import { useScrollContext } from '../../context/ScrollContext'
 import TimelineEntry from '../ui/TimelineEntry'
 import { TIMELINE, ACADEMIC_FOOTER } from '../../data/portfolioContent'
 
-// ─── Component ─────────────────────────────────────────────────────────────
+// Estimated inner height of the full timeline content (px).
+// When sectionProgress.experience reaches 1.0, the panel has fully scrolled.
+const INNER_SCROLL_HEIGHT = 1600
 
 export default function SystemArchLog() {
-  const sectionRef = useRef<HTMLElement>(null)
+  const containerRef = useRef<HTMLElement>(null)
   const { scrollState } = useScrollContext()
 
-  // Animate Y based on local section progress
-  const { ySpring } = useSpring({
-    ySpring: -(scrollState.sectionProgress.experience * 1800), // Adjust 1800 based on timeline height
-    config: { tension: 120, friction: 20 },
-  })
+  // Smooth Y-translate driven by localSectionProgress — simulates inner scroll
+  const [{ yTranslate }] = useSpring(
+    () => ({
+      yTranslate: -(scrollState.sectionProgress.experience * INNER_SCROLL_HEIGHT),
+      config: { tension: 140, friction: 26, mass: 1 },
+    }),
+    [scrollState.sectionProgress.experience],
+  )
 
   return (
     <section
       id="system-arch-log"
-      ref={sectionRef}
+      ref={containerRef as React.RefObject<HTMLElement>}
       className="relative w-full h-auto flex items-start px-8 md:px-16 lg:px-24 py-24 overflow-hidden"
+      style={{ minHeight: '100vh' }}
     >
       {/* Diagonal scan lines background */}
       <div className="pointer-events-none absolute inset-0 scanlines-diagonal opacity-20" />
 
-      {/* Animate Y translation based on local section progress */}
+      {/* Inner scroll container — translates UP as user scrolls through the section */}
       <animated.div
         className="w-full max-w-7xl mx-auto"
-        style={{
-          transform: ySpring.to((y) => `translate3d(0, ${y}px, 0)`),
-        }}
+        style={{ transform: yTranslate.to((y) => `translate3d(0, ${y}px, 0)`) }}
       >
         {/* Section header with kinetic letter-spacing animation */}
         <motion.div
           className="mb-16 flex items-start gap-6"
           initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
         >
           <div className="flex flex-col items-center gap-2 pt-2 shrink-0">
@@ -61,8 +68,7 @@ export default function SystemArchLog() {
               <motion.span
                 className="block"
                 initial={{ letterSpacing: '0.5em', opacity: 0 }}
-                whileInView={{ letterSpacing: '-0.01em', opacity: 1 }}
-                viewport={{ once: true, margin: '-100px' }}
+                animate={{ letterSpacing: '-0.01em', opacity: 1 }}
                 transition={{ duration: 1.0, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
               >
                 SYSTEM ARCHITECTURE
@@ -78,7 +84,6 @@ export default function SystemArchLog() {
 
         {/* Timeline track */}
         <div className="relative">
-          {/* Vertical line */}
           <div className="absolute left-[1.375rem] top-2 bottom-0 w-px bg-gradient-to-b from-god-crimson via-surface-3 to-transparent" />
           <div className="space-y-0">
             {TIMELINE.map((entry, idx) => (
@@ -91,8 +96,7 @@ export default function SystemArchLog() {
         <motion.div
           className="mt-14 ml-20 glass-monolith border-l-4 border-god-crimson overflow-hidden"
           initial={{ opacity: 0, x: -24 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, margin: '-50px' }}
+          animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.85, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
         >
           <div className="p-6">

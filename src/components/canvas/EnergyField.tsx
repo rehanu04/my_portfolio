@@ -161,8 +161,8 @@ const fragmentShader = /* glsl */ `
     
     color += colCosmicGold * glow;
 
-    // Output with opacity mapped to fade
-    gl_FragColor = vec4(color, fade * 0.85);
+    // Output with reduced opacity — subtle atmospheric backdrop, not a visual wall
+    gl_FragColor = vec4(color * 0.55, fade * 0.45);
   }
 `
 
@@ -187,7 +187,7 @@ export default function EnergyField() {
       transparent: true,
       blending:    THREE.AdditiveBlending,
       depthWrite:  false,
-      wireframe:   true, // Render as an energy mesh/grid
+      wireframe:   false, // Solid mesh — softer background, won't obstruct content
     })
 
     return { geometry: geo, material: mat }
