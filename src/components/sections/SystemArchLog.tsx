@@ -1,11 +1,9 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // src/components/sections/SystemArchLog.tsx  (Experience)
 //
-// Architecture timeline — full-screen DOM section.
-// Glassmorphism card wrappers on each TimelineEntry.
-// Kinetic section header with letter-spacing animation.
-// Scroll-in animations via framer-motion whileInView (works perfectly
-// since this is now a real scrolling DOM element, not a 3D projection).
+// Cinematic vertical timeline with large visual timeline track.
+// Each entry reveals with a staggered whileInView animation.
+// Academic footer has a distinct glass panel treatment.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { type RefObject, useEffect, useRef } from 'react'
@@ -28,10 +26,10 @@ export default function SystemArchLog() {
       ref={sectionRef}
       className="relative w-full px-8 md:px-16 lg:px-24 py-32"
     >
-      {/* Diagonal scan lines background */}
-      <div className="pointer-events-none absolute inset-0 scanlines-diagonal opacity-10" />
+      {/* Section divider top */}
+      <div className="section-divider mb-0" />
 
-      <div className="w-full max-w-7xl mx-auto">
+      <div className="w-full max-w-7xl mx-auto pt-16">
         {/* Section header */}
         <motion.div
           className="mb-20 flex items-start gap-6"
@@ -45,13 +43,14 @@ export default function SystemArchLog() {
             <div className="w-px h-14 bg-gradient-to-b from-god-crimson to-transparent" />
           </div>
           <div>
-            <p className="font-mono text-xs tracking-[0.32em] text-god-crimson uppercase mb-3 text-glow-crimson">
+            <div className="section-chip mb-4">
+              <div className="w-1 h-1 rounded-full bg-god-crimson" />
               sys::arch_log — SECTION_02
-            </p>
+            </div>
             <h2 className="font-display font-bold text-4xl md:text-6xl text-text-primary leading-tight">
               <motion.span
                 className="block"
-                initial={{ letterSpacing: '0.5em', opacity: 0 }}
+                initial={{ letterSpacing: '0.4em', opacity: 0 }}
                 whileInView={{ letterSpacing: '-0.01em', opacity: 1 }}
                 viewport={{ once: true, margin: '-80px' }}
                 transition={{ duration: 1.0, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
@@ -61,15 +60,16 @@ export default function SystemArchLog() {
               <span className="font-light text-text-muted">LOG</span>
             </h2>
             <p className="mt-4 text-text-muted font-display text-lg max-w-xl leading-relaxed">
-              Engineering trajectory. An operational record of systems built, protocols designed,
+              Engineering trajectory — an operational record of systems built, protocols designed,
               and architectures deployed across native mobile, AI, and agent domains.
             </p>
           </div>
         </motion.div>
 
-        {/* Timeline track */}
+        {/* Timeline */}
         <div className="relative">
-          <div className="absolute left-[1.375rem] top-2 bottom-0 w-px bg-gradient-to-b from-god-crimson via-surface-3 to-transparent" />
+          {/* Vertical track line */}
+          <div className="absolute left-[1.375rem] top-0 bottom-24 w-px bg-gradient-to-b from-god-crimson via-god-crimson/30 to-transparent" />
           <div className="space-y-0">
             {TIMELINE.map((entry, idx) => (
               <TimelineEntry key={entry.id} entry={entry} index={idx} />
@@ -77,27 +77,34 @@ export default function SystemArchLog() {
           </div>
         </div>
 
-        {/* Academic footer */}
+        {/* Academic foundation card */}
         <motion.div
-          className="mt-14 ml-20 glass-monolith border-l-4 border-god-crimson overflow-hidden"
-          initial={{ opacity: 0, x: -24 }}
+          className="mt-14 ml-14 glass-card overflow-hidden"
+          initial={{ opacity: 0, x: -30 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, margin: '-50px' }}
-          transition={{ duration: 0.85, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.85, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div className="p-6">
-            <p className="font-mono text-[10px] text-god-crimson tracking-[0.28em] mb-2 text-glow-crimson">
-              {ACADEMIC_FOOTER.label}
-            </p>
-            <p className="font-display font-semibold text-text-primary">
-              {ACADEMIC_FOOTER.degree}
-            </p>
-            <p className="font-mono text-sm text-text-muted mt-1">
-              {ACADEMIC_FOOTER.tracks}
-            </p>
+          <div className="flex items-stretch">
+            {/* Crimson left accent */}
+            <div className="w-1 bg-gradient-to-b from-god-crimson to-god-crimson/20 flex-shrink-0" />
+            <div className="p-6 flex-1">
+              <p className="font-mono text-[9px] text-god-crimson tracking-[0.28em] mb-2 text-glow-crimson">
+                {ACADEMIC_FOOTER.label}
+              </p>
+              <p className="font-display font-semibold text-text-primary text-lg">
+                {ACADEMIC_FOOTER.degree}
+              </p>
+              <p className="font-mono text-sm text-text-muted mt-1 tracking-wide">
+                {ACADEMIC_FOOTER.tracks}
+              </p>
+            </div>
           </div>
         </motion.div>
       </div>
+
+      {/* Section divider bottom */}
+      <div className="section-divider mt-20" />
     </section>
   )
 }

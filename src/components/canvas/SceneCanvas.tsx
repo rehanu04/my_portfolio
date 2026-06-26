@@ -1,14 +1,9 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // src/components/canvas/SceneCanvas.tsx
 //
-// Fixed, full-viewport WebGL canvas — pure atmosphere.
-// NO HTML content rendered inside — only shaders and geometry.
-//
-// Post-Processing Pipeline:
-//   1. Selective Bloom  — luminance-threshold 0.55, intensity 1.4
-//   2. Chromatic Aberration — scroll-dynamic offset
-//   3. Vignette           — soft darkening toward corners
-//   4. Noise              — organic cinematic film grain
+// Fixed full-viewport WebGL atmospheric canvas.
+// Pure atmosphere — StarField (3000 particles) + EnergyField (infinite grid).
+// CameraRig drives ambient parallax.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { Suspense, useRef } from 'react'
@@ -18,17 +13,14 @@ import {
   Bloom,
   ChromaticAberration,
   Vignette,
-  Noise,
 } from '@react-three/postprocessing'
 import { BlendFunction } from 'postprocessing'
 import { Vector2 } from 'three'
 import * as THREE from 'three'
 import CameraRig from './CameraRig'
+import StarField from './StarField'
 import EnergyField from './EnergyField'
-import CoordinateGrid from './CoordinateGrid'
 import { useScrollContext } from '../../context/ScrollContext'
-
-// ─── Dynamic Post-Processing ─────────────────────────────────────────────────
 
 function DynamicPostProcessing() {
   const { scrollState } = useScrollContext()
@@ -37,44 +29,38 @@ function DynamicPostProcessing() {
   useFrame(() => {
     if (!caRef.current) return
     const p = scrollState.scrollProgress
-    const edgeness = Math.max(0, 1 - Math.abs(p - 0.5) * 2.8)
-    const centerEdge = 1 - edgeness
-    const caStrength = 0.0003 + centerEdge * 0.0008
+    const caStrength = 0.0002 + p * 0.0004
     caRef.current.offset.set(caStrength, caStrength)
   })
 
   return (
     <EffectComposer>
+      {/* Subtle bloom on the crimson star accents */}
       <Bloom
-        luminanceThreshold={0.55}
-        luminanceSmoothing={0.15}
-        intensity={1.4}
+        luminanceThreshold={0.7}
+        luminanceSmoothing={0.2}
+        intensity={0.8}
         blendFunction={BlendFunction.ADD}
       />
+      {/* Very gentle chromatic aberration — cinematic */}
       <ChromaticAberration
-        // @ts-expect-error – ref forwarding supported but not typed
+        // @ts-expect-error – ref forwarding supported
         ref={caRef}
         blendFunction={BlendFunction.NORMAL}
-        offset={new Vector2(0.0006, 0.0006)}
+        offset={new Vector2(0.0003, 0.0003)}
         radialModulation={false}
-        modulationOffset={0.12}
+        modulationOffset={0.15}
       />
+      {/* Vignette — push focus to centre */}
       <Vignette
         eskil={false}
-        offset={0.3}
-        darkness={0.8}
+        offset={0.25}
+        darkness={0.85}
         blendFunction={BlendFunction.NORMAL}
-      />
-      <Noise
-        premultiply
-        blendFunction={BlendFunction.SOFT_LIGHT}
-        opacity={0.15}
       />
     </EffectComposer>
   )
 }
-
-// ─── Main Canvas ─────────────────────────────────────────────────────────────
 
 export default function SceneCanvas() {
   return (
@@ -87,28 +73,22 @@ export default function SceneCanvas() {
       }}
     >
       <Canvas
-        camera={{ position: [0, 0, 18], fov: 58, near: 0.1, far: 500 }}
+        camera={{ position: [0, 4, 22], fov: 55, near: 0.1, far: 500 }}
         gl={{
           antialias:           true,
           alpha:               true,
           powerPreference:     'high-performance',
           toneMapping:         THREE.ACESFilmicToneMapping,
-          toneMappingExposure: 1.1,
+          toneMappingExposure: 0.9,
         }}
         dpr={[1, 1.5]}
         style={{ background: 'transparent' }}
       >
         <Suspense fallback={null}>
           <CameraRig />
-          <ambientLight intensity={0.04} />
-
-          {/* God-Tier Saiyan Energy Field — atmospheric backdrop */}
+          <ambientLight intensity={0.02} />
+          <StarField />
           <EnergyField />
-
-          {/* Coordinate grid — subtle, always-on */}
-          <CoordinateGrid />
-
-          {/* Cinematic post-processing */}
           <DynamicPostProcessing />
         </Suspense>
       </Canvas>
